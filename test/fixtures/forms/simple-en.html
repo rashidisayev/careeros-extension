@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Apply: Senior Platform Engineer at Northwind</title></head>
+<body>
+  <header>
+    <form role="search" action="/search"><label for="q">Search jobs</label><input id="q" name="q" type="text"></form>
+  </header>
+  <main>
+    <h1>Senior Platform Engineer</h1>
+    <form id="application" action="/apply" method="post">
+      <h2>Personal information</h2>
+      <label for="fn">First name *</label><input id="fn" name="first_name" required>
+      <label for="ln">Last name *</label><input id="ln" name="last_name" required>
+      <label for="em">Email address *</label><input id="em" name="email" type="email" required>
+      <label for="ph">Phone number</label><input id="ph" name="phone" type="tel">
+      <label for="city">City</label><input id="city" name="city">
+      <label for="country">Country</label>
+      <select id="country" name="country">
+        <option value="">Please select</option>
+        <option value="AT">Austria</option>
+        <option value="DE">Germany</option>
+        <option value="CH">Switzerland</option>
+      </select>
+      <h2>Experience</h2>
+      <label for="title">Current job title</label><input id="title" name="current_title">
+      <label for="org">Current employer</label><input id="org" name="current_company">
+      <label for="yoe">Years of experience</label><input id="yoe" name="years" type="number">
+      <fieldset>
+        <legend>Do you have people management experience?</legend>
+        <label><input type="radio" name="mgmt" value="yes"> Yes</label>
+        <label><input type="radio" name="mgmt" value="no"> No</label>
+      </fieldset>
+      <label for="li">LinkedIn profile</label><input id="li" name="linkedin" type="url">
+      <label for="gh">GitHub</label><input id="gh" name="github">
+      <label for="cv">Resume/CV *</label><input id="cv" name="resume" type="file" accept=".pdf,.docx" required>
+      <label for="cl">Cover letter</label><textarea id="cl" name="cover_letter"></textarea>
+      <label for="why">Why do you want to work at Northwind?</label><textarea id="why" name="q1"></textarea>
+      <label for="salary">Salary expectations</label><input id="salary" name="salary">
+      <label for="auth">Are you legally authorized to work in Germany?</label>
+      <select id="auth" name="auth"><option value=""></option><option>Yes</option><option>No</option></select>
+      <label for="gender">Gender</label>
+      <select id="gender" name="gender"><option value="">Decline to state</option><option>Female</option><option>Male</option><option>Non-binary</option></select>
+      <label><input type="checkbox" name="privacy" required> I agree to the privacy policy</label>
+      <input type="hidden" name="token" value="abc">
+      <input type="password" name="pw" style="display:none">
+      <button type="submit">Submit application</button>
+    </form>
+  </main>
+  <footer>
+    <form action="/newsletter"><label for="nl">Get job alerts by email</label><input id="nl" type="email" name="newsletter_email"><button>Subscribe</button></form>
+  </footer>
+</body>
+</html>

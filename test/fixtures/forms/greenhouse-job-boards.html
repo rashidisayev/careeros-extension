@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Job Application for Engineering Manager at Northwind</title></head>
+<body>
+  <!-- Modelled on Greenhouse's job-boards.greenhouse.io markup (2026): react-select comboboxes,
+       aria-label inputs, and intl-tel-input's country picker with a type=search box. -->
+  <header><form role="search" action="/northwind/search"><input type="search" aria-label="Search jobs" name="q"></form></header>
+  <form method="get" action="/northwind/jobs/4711" id="application-form" class="application--form">
+    <h2>Apply for this job</h2>
+    <div class="text-input-wrapper"><label id="first_name-label" for="first_name">First Name<span>*</span></label>
+      <input id="first_name" class="input" aria-label="First Name" aria-required="true" type="text" maxlength="255" autocomplete="given-name" value=""></div>
+    <div class="text-input-wrapper"><label id="last_name-label" for="last_name">Last Name<span>*</span></label>
+      <input id="last_name" class="input" aria-label="Last Name" aria-required="true" type="text" maxlength="255" autocomplete="family-name" value=""></div>
+    <div class="text-input-wrapper"><label id="email-label" for="email">Email<span>*</span></label>
+      <input id="email" class="input" aria-label="Email" aria-required="true" type="text" maxlength="255" autocomplete="email" value=""></div>
+    <div class="select"><label id="country-label" for="country">Country</label>
+      <div class="select__control"><input class="select__input" autocomplete="off" id="country" type="text" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-haspopup="true" aria-labelledby="country-label" value=""></div></div>
+    <div class="phone-input">
+      <div class="iti__dropdown-content">
+        <input id="iti-0__search-input" type="search" class="iti__search-input" placeholder="Search" role="combobox" aria-expanded="true" aria-label="Search" aria-autocomplete="list">
+        <ul id="iti-0__country-listbox" role="listbox"><li role="option">Germany +49</li><li role="option">United Kingdom +44</li></ul>
+      </div>
+      <label id="phone-label" for="phone">Phone</label>
+      <input id="phone" class="input" aria-label="Phone" type="tel" maxlength="255">
+    </div>
+    <div class="select"><label id="candidate-location-label" for="candidate-location">Location (City)<span>*</span></label>
+      <div class="select__control"><input class="select__input" autocomplete="off" id="candidate-location" type="text" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-labelledby="candidate-location-label" aria-required="true" value=""></div></div>
+    <div class="file-upload"><div id="upload-label-resume" class="label">Resume/CV<span>*</span></div>
+      <button type="button">Attach</button><label for="resume" class="visually-hidden">Attach</label>
+      <input id="resume" class="visually-hidden" type="file" accept=".pdf,.doc,.docx,.txt,.rtf" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></div>
+    <div class="text-input-wrapper"><label for="question_1">LinkedIn Profile</label>
+      <input id="question_1" class="input" aria-label="LinkedIn Profile" type="text" maxlength="255" value=""></div>
+    <div class="select"><label id="question_2-label" for="question_2">Will you now or in the future require sponsorship for a visa?<span>*</span></label>
+      <div class="select__control"><input class="select__input" autocomplete="off" id="question_2" type="text" role="combobox" aria-labelledby="question_2-label" aria-required="true" value=""></div></div>
+    <div class="select"><label id="gender-label" for="gender">Gender</label>
+      <div class="select__control"><input class="select__input" autocomplete="off" id="gender" type="text" role="combobox" aria-labelledby="gender-label" value=""></div></div>
+    <button type="submit">Submit application</button>
+  </form>
+</body>
+</html>

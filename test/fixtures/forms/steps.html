@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Apply: Platform Lead at Brightwave (step 1 of 2)</title></head>
+<body>
+<!-- A two-step application on one page: "Next" swaps the first step's fields for the second's. -->
+<form id="apply" action="/apply/submit" method="post">
+  <div id="step">
+    <h2>Your details</h2>
+    <label for="fn">First name</label><input id="fn" name="first_name" required>
+    <label for="ln">Last name</label><input id="ln" name="last_name" required>
+    <label for="em">Email</label><input id="em" name="email" type="email" required>
+    <label id="lbl-country">Country</label>
+    <button type="button" id="country" aria-haspopup="listbox" aria-labelledby="lbl-country" aria-controls="country-list">Select...</button>
+    <div role="listbox" id="country-list" hidden>
+      <div role="option">Austria</div><div role="option">Germany</div><div role="option">Switzerland</div>
+    </div>
+    <h2>Work experience</h2>
+    <label for="c0">Company</label><input id="c0" name="experience[0][company]">
+    <label for="t0">Job title</label><input id="t0" name="experience[0][title]">
+    <label for="c1">Company</label><input id="c1" name="experience[1][company]">
+    <label for="t1">Job title</label><input id="t1" name="experience[1][title]">
+    <label for="s1">From (MM/YYYY)</label><input id="s1" name="experience[1][start]">
+    <label for="cv">CV</label><input id="cv" name="cv" type="file" accept=".pdf">
+    <button type="button" id="next">Next</button>
+  </div>
+</form>
+<template id="step2">
+  <h2>Education</h2>
+  <label for="uni">University</label><input id="uni" name="education[0][school]">
+  <label for="deg">Degree</label>
+  <select id="deg" name="education[0][degree]"><option value="">Please select</option><option>Bachelor's degree</option><option>Master's degree</option><option>PhD</option></select>
+  <label for="gy">Graduation year</label>
+  <select id="gy" name="education[0][end_year]"><option value="">Year</option><option>2015</option><option>2014</option><option>2013</option><option>2012</option></select>
+  <label for="why">Why do you want to join Brightwave?</label><textarea id="why" name="why"></textarea>
+  <button type="submit">Submit application</button>
+</template>
+<script>
+{
+  const btn = document.getElementById("country");
+  const list = document.getElementById("country-list");
+  btn.addEventListener("mousedown", () => { list.hidden = false; });
+  list.addEventListener("click", (e) => {
+    const o = e.target.closest("[role=option]");
+    if (!o) return;
+    btn.textContent = o.textContent;
+    list.hidden = true;
+  });
+  document.getElementById("next").addEventListener("click", () => {
+    const step = document.getElementById("step");
+    step.replaceChildren(document.getElementById("step2").content.cloneNode(true));
+    document.title = "Apply: Platform Lead at Brightwave (step 2 of 2)";
+  });
+}
+</script>
+</body>
+</html>

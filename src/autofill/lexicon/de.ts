@@ -1,0 +1,160 @@
+import type { Lexicon } from "./types";
+
+const ELSEWHERE = ["wunsch", "bevorzugt", "bevorzugter", "gewunscht", "gewunschter", "umzug", "arbeiten mochten", "einsatzort"];
+
+export const de: Lexicon = {
+  lang: "de",
+  keys: {
+    first_name: { exact: ["vorname", "vornamen", "rufname"], phrases: ["vorname"] },
+    last_name: { exact: ["nachname", "familienname", "zuname"], phrases: ["nachname", "familienname"] },
+    full_name: {
+      exact: ["name", "vollstandiger name", "vor und nachname", "vor und zuname", "name vorname", "vorname name", "vorname und nachname"],
+      phrases: ["vor und nachname", "vorname und nachname", "vollstandiger name"],
+      not: ["firma", "unternehmen", "arbeitgeber", "schule", "hochschule", "datei", "referenz"],
+    },
+    email: {
+      exact: ["e mail", "email", "e mail adresse", "emailadresse", "email adresse", "mailadresse"],
+      phrases: ["e mail adresse", "e mail", "email"],
+      not: ["newsletter", "abonnieren", "benachrichtigung", "jobalert"],
+    },
+    phone: {
+      exact: ["telefon", "telefonnummer", "handy", "handynummer", "mobil", "mobilnummer", "mobiltelefon", "rufnummer", "mobilfunknummer", "telefon mobil"],
+      phrases: ["telefonnummer", "mobilnummer", "handynummer", "mobilfunknummer", "rufnummer", "telefon"],
+      not: ["vorwahl", "landervorwahl"],
+    },
+    phone_country_code: { exact: ["landervorwahl", "landesvorwahl", "vorwahl"], phrases: ["landervorwahl", "landesvorwahl"] },
+    street_address: {
+      exact: ["strasse", "strasse und hausnummer", "strasse hausnummer", "strasse nr", "str nr", "adresse", "anschrift", "wohnadresse", "postanschrift"],
+      phrases: ["strasse und hausnummer", "strasse", "anschrift", "wohnadresse"],
+      not: ["e mail", "email", "web", "zusatz"],
+    },
+    postal_code: { exact: ["plz", "postleitzahl"], phrases: ["postleitzahl", "plz"], not: ["ort"] },
+    city: { exact: ["ort", "stadt", "wohnort", "wohnort stadt"], phrases: ["wohnort", "stadt"], not: ELSEWHERE },
+    country: {
+      exact: ["land", "wohnsitzland", "land der wohnsitzes", "land des wohnsitzes"],
+      phrases: ["land des wohnsitzes", "wohnsitzland"],
+      not: ["staatsangehorigkeit", "vorwahl", ...ELSEWHERE],
+    },
+    location: { exact: ["standort", "aktueller standort", "wohnort land"], phrases: ["aktueller standort"], not: ELSEWHERE },
+    current_title: {
+      exact: ["aktuelle position", "jobtitel", "berufsbezeichnung", "aktuelle tatigkeit", "aktuelle stelle", "derzeitige position", "aktuelle berufsbezeichnung", "aktueller jobtitel"],
+      phrases: ["aktuelle position", "derzeitige position", "aktuelle berufsbezeichnung", "aktuelle tatigkeit", "aktueller jobtitel"],
+      not: ["bewerben", "gewunschte"],
+    },
+    current_company: {
+      exact: ["aktueller arbeitgeber", "derzeitiger arbeitgeber", "aktuelles unternehmen", "jetziger arbeitgeber"],
+      weak: ["arbeitgeber", "unternehmen", "firma"],
+      phrases: ["aktueller arbeitgeber", "derzeitiger arbeitgeber", "jetziger arbeitgeber", "aktuelles unternehmen"],
+      not: ["fruherer", "vorheriger", "website", "grosse"],
+    },
+    headline: { exact: ["profiluberschrift", "uberschrift"], phrases: ["profiluberschrift"] },
+    years_of_experience: {
+      exact: ["berufserfahrung", "berufserfahrung in jahren", "jahre berufserfahrung", "berufserfahrung jahre", "jahre erfahrung"],
+      phrases: ["jahre berufserfahrung", "berufserfahrung in jahren", "wie viele jahre", "jahre erfahrung", "berufserfahrung"],
+      not: ["fuhrung", "beschreiben"],
+    },
+    summary: {
+      exact: ["uber mich", "zusammenfassung", "kurzprofil", "profil", "kurzbeschreibung"],
+      phrases: ["uber mich", "kurzprofil", "zusammenfassung"],
+      not: ["anschreiben", "warum"],
+    },
+    industry: { exact: ["branche", "aktuelle branche"], phrases: ["branche"], not: ["wunsch", "bevorzugt"] },
+    seniority: {
+      exact: ["karrierestufe", "karrierelevel", "erfahrungslevel", "erfahrungsstufe", "senioritat", "berufserfahrungsstufe"],
+      phrases: ["karrierestufe", "erfahrungslevel"],
+    },
+    management_experience: { phrases: ["fuhrungserfahrung", "personalverantwortung", "fuhrungsverantwortung"], not: ["jahre", "wie viele"] },
+    leadership_experience: { phrases: ["fuhrungserfahrung", "personalverantwortung", "fuhrungsverantwortung"], not: ["jahre", "wie viele"] },
+    linkedin_url: { exact: ["linkedin", "linkedin profil"], phrases: ["linkedin"] },
+    github_url: { exact: ["github", "github profil"], phrases: ["github"] },
+    portfolio_url: { exact: ["portfolio", "arbeitsproben"], phrases: ["portfolio", "arbeitsproben"], not: ["hochladen", "datei"] },
+    website_url: { exact: ["webseite", "website", "homepage", "personliche webseite", "internetseite"], phrases: ["personliche webseite", "webseite", "homepage"] },
+
+    date_of_birth: { phrases: ["geburtsdatum", "geburtstag", "geboren am", "geburtsjahr"] },
+    nationality: { phrases: ["staatsangehorigkeit", "nationalitat"] },
+    citizenship: { phrases: ["staatsburgerschaft"] },
+    gender: { phrases: ["geschlecht", "pronomen"] },
+    salutation: { exact: ["anrede", "titel"], phrases: ["anrede"] },
+    work_authorization: { phrases: ["arbeitserlaubnis", "aufenthaltstitel", "arbeitsgenehmigung", "aufenthaltserlaubnis", "berechtigt in deutschland zu arbeiten", "arbeitsberechtigung"] },
+    visa_sponsorship: { phrases: ["visum", "visa", "sponsoring"] },
+    disability: { phrases: ["schwerbehinderung", "behinderung", "gleichstellung", "schwerbehindert"] },
+    criminal_record: { phrases: ["fuhrungszeugnis", "vorstrafen", "vorbestraft"] },
+    salary_expectation: {
+      phrases: ["gehaltsvorstellung", "gehaltsvorstellungen", "gehaltswunsch", "wunschgehalt", "gehaltserwartung", "jahresgehalt", "gehalt"],
+      not: ["aktuelles", "derzeitiges", "jetziges", "letztes"],
+    },
+    current_salary: { phrases: ["aktuelles gehalt", "derzeitiges gehalt", "jetziges gehalt"] },
+    relocation: { phrases: ["umzugsbereitschaft", "umzugsbereit", "bereit umzuziehen", "relocation"] },
+    notice_period: { phrases: ["kundigungsfrist"] },
+    availability_date: { phrases: ["fruhester eintrittstermin", "eintrittstermin", "verfugbar ab", "startdatum", "fruhestmoglicher eintritt", "eintrittsdatum", "verfugbarkeit", "starttermin"] },
+    consent: { phrases: ["datenschutz", "datenschutzerklarung", "einwilligung", "ich stimme", "ich akzeptiere", "einverstanden", "ich bestatige", "datenschutzhinweise", "talentpool"] },
+    referral_source: { phrases: ["wie haben sie", "aufmerksam geworden", "wie sind sie auf", "wo haben sie", "quelle", "empfehlung"] },
+    skills: {
+      exact: ["kenntnisse", "fahigkeiten", "fachkenntnisse", "kompetenzen", "skills", "it kenntnisse", "fachliche kompetenzen", "qualifikationen"],
+      phrases: ["ihre kenntnisse", "fachkenntnisse", "it kenntnisse", "fachliche kompetenzen", "fahigkeiten"],
+      not: ["sprach", "jahre", "beschreiben"],
+    },
+    languages: {
+      exact: ["sprachen", "sprachkenntnisse", "fremdsprachen", "fremdsprachenkenntnisse"],
+      phrases: ["sprachkenntnisse", "fremdsprachenkenntnisse", "welche sprachen", "fremdsprachen"],
+      not: ["programmier", "muttersprache"],
+    },
+    certifications: {
+      exact: ["zertifikate", "zertifizierungen", "zertifizierung", "weiterbildungen", "lizenzen und zertifikate"],
+      phrases: ["zertifizierungen", "lizenzen und zertifikate"],
+      not: ["hochladen", "anhang"],
+    },
+    preferred_location: {
+      exact: ["bevorzugter standort", "wunschstandort", "wunschort", "bevorzugter arbeitsort", "gewunschter arbeitsort", "gewunschter standort", "einsatzort"],
+      phrases: ["bevorzugter standort", "wunschstandort", "gewunschter arbeitsort", "bevorzugter arbeitsort", "an welchem standort"],
+    },
+    remote_preference: {
+      exact: ["arbeitsmodell", "homeoffice", "home office", "remote", "mobiles arbeiten", "arbeitsort modell"],
+      phrases: ["arbeitsmodell", "mobiles arbeiten", "homeoffice", "home office", "remote arbeiten"],
+    },
+    employment_type: {
+      exact: ["anstellungsart", "beschaftigungsart", "art der anstellung", "art der beschaftigung", "vertragsart", "vollzeit teilzeit", "arbeitszeitmodell", "vollzeit oder teilzeit"],
+      phrases: ["anstellungsart", "beschaftigungsart", "art der anstellung", "art der beschaftigung", "vollzeit oder teilzeit", "arbeitszeitmodell"],
+    },
+    work_company: {
+      exact: ["arbeitgeber", "unternehmen", "firma", "unternehmensname", "firmenname", "name des arbeitgebers", "organisation"],
+      phrases: ["name des arbeitgebers", "unternehmensname", "firmenname"],
+      not: ["website", "grosse", "branche"],
+    },
+    work_title: {
+      exact: ["position", "titel", "jobtitel", "berufsbezeichnung", "tatigkeit", "funktion", "stellenbezeichnung", "rolle"],
+      phrases: ["berufsbezeichnung", "stellenbezeichnung", "jobtitel"],
+    },
+    work_location: { exact: ["ort", "standort", "arbeitsort", "stadt"], phrases: ["arbeitsort"] },
+    work_start: { exact: ["von", "beginn", "startdatum", "start", "seit", "anfang", "eintritt", "von monat", "von jahr", "beginn monat", "beginn jahr"], phrases: ["beginn", "startdatum"] },
+    work_end: { exact: ["bis", "ende", "enddatum", "austritt", "bis monat", "bis jahr", "ende monat", "ende jahr"], phrases: ["enddatum"], not: ["heute", "aktuell"] },
+    work_current: {
+      exact: ["aktuell", "bis heute", "derzeit", "aktuelle position", "aktuelle stelle", "ich arbeite derzeit hier"],
+      phrases: ["bis heute", "arbeite derzeit hier", "aktuelle stelle", "aktuelle position", "derzeit hier"],
+    },
+    work_description: {
+      exact: ["beschreibung", "tatigkeitsbeschreibung", "aufgaben", "aufgabenbereich", "verantwortlichkeiten", "tatigkeiten", "erfolge"],
+      phrases: ["tatigkeitsbeschreibung", "aufgabenbereich", "ihre aufgaben", "verantwortlichkeiten"],
+    },
+    edu_school: {
+      exact: ["schule", "hochschule", "universitat", "bildungseinrichtung", "institution", "name der hochschule", "name der schule", "schule hochschule", "fachhochschule"],
+      phrases: ["name der hochschule", "name der schule", "bildungseinrichtung", "hochschule", "universitat"],
+    },
+    edu_degree: { exact: ["abschluss", "studienabschluss", "hochster abschluss", "art des abschlusses", "akademischer grad", "bildungsabschluss"], phrases: ["art des abschlusses", "akademischer grad", "studienabschluss"] },
+    edu_field: { exact: ["studiengang", "studienfach", "fachrichtung", "studienrichtung", "fach", "schwerpunkt", "ausbildungsberuf"], phrases: ["studiengang", "studienfach", "fachrichtung", "studienrichtung"] },
+    edu_end: { phrases: ["abschlussjahr", "jahr des abschlusses", "abschlussdatum"] },
+    resume: { exact: ["lebenslauf", "cv"], phrases: ["lebenslauf"] },
+    cover_letter: { phrases: ["anschreiben", "motivationsschreiben", "bewerbungsschreiben"] },
+    other_document: { phrases: ["zeugnisse", "zeugnis", "arbeitszeugnisse", "zertifikate", "anlagen", "weitere dokumente", "weitere unterlagen", "sonstige unterlagen"] },
+  },
+  otherPerson: ["referenz", "referenzen", "referenzperson", "notfallkontakt", "empfohlen von", "empfehlungsgeber"],
+  yes: ["ja", "j"],
+  no: ["nein"],
+  salutations: ["herr", "frau", "divers", "keine angabe"],
+  questionStarts: ["warum", "was", "wie", "beschreiben sie", "erzahlen sie", "erlautern sie", "welche", "weshalb"],
+  sections: {
+    work: ["berufserfahrung", "beruflicher werdegang", "werdegang", "berufliche stationen", "arbeitserfahrung", "berufstatigkeit", "bisherige tatigkeiten", "praxiserfahrung"],
+    education: ["ausbildung", "bildungsweg", "schulbildung", "studium", "akademischer werdegang", "bildung", "schul und berufsausbildung", "hochschulbildung"],
+  },
+  months: ["januar", "februar", "marz", "april", "mai", "juni", "juli", "august", "september", "oktober", "november", "dezember"],
+};

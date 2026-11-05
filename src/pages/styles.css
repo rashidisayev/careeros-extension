@@ -1,0 +1,152 @@
+/*
+ * CareerOS design tokens for the extension's pages, copied from apps/web/app/globals.css
+ * (see DESIGN.md). Petrol for actions, saffron only for "next step" nodes, one fit scale for
+ * matches, state colours only where they mean state. Dark is the default theme.
+ */
+@import "tailwindcss";
+@import "@fontsource-variable/hanken-grotesk";
+
+/* The Vite root is src/pages; components live next to it. */
+@source "../";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Hanken Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-popover: var(--popover);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-node: var(--brand-node);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-fit-1: var(--fit-1); --color-fit-1-foreground: var(--fit-1-foreground);
+  --color-fit-2: var(--fit-2); --color-fit-2-foreground: var(--fit-2-foreground);
+  --color-fit-3: var(--fit-3); --color-fit-3-foreground: var(--fit-3-foreground);
+  --color-fit-4: var(--fit-4); --color-fit-4-foreground: var(--fit-4-foreground);
+  --color-fit-5: var(--fit-5); --color-fit-5-foreground: var(--fit-5-foreground);
+  --shadow-card: var(--shadow-card);
+  --radius-md: 0.4rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.7rem;
+}
+
+:root {
+  --brand: oklch(0.46 0.085 222);
+  --brand-node: oklch(0.82 0.15 82);
+  --background: oklch(0.985 0.004 222);
+  --foreground: oklch(0.22 0.02 225);
+  --card: oklch(1 0 0);
+  --popover: oklch(1 0 0);
+  --primary: oklch(0.46 0.085 222);
+  --primary-foreground: oklch(0.99 0.004 218);
+  --secondary: oklch(0.955 0.008 220);
+  --secondary-foreground: oklch(0.26 0.03 224);
+  --muted: oklch(0.962 0.006 220);
+  --muted-foreground: oklch(0.47 0.02 225);
+  --accent: oklch(0.95 0.012 220);
+  --destructive: oklch(0.55 0.2 27);
+  --border: oklch(0.905 0.008 222);
+  --input: oklch(0.86 0.012 222);
+  --ring: oklch(0.55 0.095 221);
+  --success: oklch(0.5 0.12 158);
+  --warning: oklch(0.57 0.15 55);
+  --fit-1: oklch(0.955 0.004 220);  --fit-1-foreground: oklch(0.48 0.01 225);
+  --fit-2: oklch(0.95 0.012 220);   --fit-2-foreground: oklch(0.4 0.03 223);
+  --fit-3: oklch(0.92 0.03 220);    --fit-3-foreground: oklch(0.34 0.05 223);
+  --fit-4: oklch(0.86 0.05 220);    --fit-4-foreground: oklch(0.3 0.06 223);
+  --fit-5: oklch(0.46 0.085 222);   --fit-5-foreground: oklch(0.99 0.004 218);
+  --shadow-card: 0 1px 2px oklch(0.25 0.04 224 / 6%), 0 1px 1px oklch(0.25 0.04 224 / 4%);
+}
+
+.dark {
+  --brand: oklch(0.72 0.09 218);
+  --background: oklch(0.16 0.012 228);
+  --foreground: oklch(0.95 0.006 220);
+  --card: oklch(0.195 0.014 228);
+  --popover: oklch(0.22 0.016 228);
+  --primary: oklch(0.72 0.09 218);
+  --primary-foreground: oklch(0.17 0.03 225);
+  --secondary: oklch(0.245 0.016 226);
+  --secondary-foreground: oklch(0.93 0.006 220);
+  --muted: oklch(0.225 0.014 227);
+  --muted-foreground: oklch(0.72 0.015 222);
+  --accent: oklch(0.255 0.018 226);
+  --destructive: oklch(0.7 0.17 25);
+  --border: oklch(0.27 0.014 226);
+  --input: oklch(0.33 0.016 226);
+  --ring: oklch(0.76 0.07 219);
+  --success: oklch(0.76 0.13 158);
+  --warning: oklch(0.78 0.13 60);
+  --fit-1: oklch(0.23 0.008 226);   --fit-1-foreground: oklch(0.7 0.01 225);
+  --fit-2: oklch(0.25 0.025 224);   --fit-2-foreground: oklch(0.8 0.02 220);
+  --fit-3: oklch(0.3 0.05 223);     --fit-3-foreground: oklch(0.86 0.04 218);
+  --fit-4: oklch(0.38 0.07 222);    --fit-4-foreground: oklch(0.92 0.03 218);
+  --fit-5: oklch(0.72 0.09 218);    --fit-5-foreground: oklch(0.17 0.03 225);
+  --shadow-card: none;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html {
+    @apply font-sans;
+    color-scheme: light;
+    scrollbar-color: oklch(0.75 0.015 222) transparent;
+  }
+  html.dark {
+    color-scheme: dark;
+    scrollbar-color: oklch(0.36 0.016 226) transparent;
+  }
+  body {
+    @apply bg-background text-foreground text-sm;
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled), summary { cursor: pointer; }
+  h1, h2, h3 { text-wrap: balance; letter-spacing: -0.012em; }
+  p { text-wrap: pretty; }
+  ::selection { background: color-mix(in oklch, var(--brand) 28%, transparent); }
+  input, textarea { caret-color: var(--primary); }
+  a { text-underline-offset: 0.2em; }
+  .tabular { font-variant-numeric: tabular-nums; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+    .animate-spin {
+      animation-duration: 1.6s !important;
+      animation-iteration-count: infinite !important;
+    }
+  }
+}
+
+/* One focus indicator everywhere (DESIGN.md): 2px solid ring, 2px offset. */
+:focus-visible {
+  outline: 2px solid var(--ring) !important;
+  outline-offset: 2px !important;
+}
+
+/* Native selects, styled like the app's inputs, with the platform's own keyboard behaviour. */
+select.field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23889' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  padding-right: 2rem;
+}

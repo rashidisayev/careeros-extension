@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><title>Bewerbung: Platform Engineer (m/w/d)</title></head>
+<body>
+  <form id="bewerbung">
+    <h2>Persönliche Angaben</h2>
+    <label for="anrede">Anrede</label>
+    <select id="anrede" name="anrede"><option value="">Bitte wählen</option><option>Herr</option><option>Frau</option><option>Divers</option></select>
+    <label for="vn">Vorname*</label><input id="vn" name="vorname" required>
+    <label for="nn">Nachname*</label><input id="nn" name="nachname" required>
+    <label for="mail">E-Mail-Adresse*</label><input id="mail" name="email" type="email" required>
+    <label for="tel">Telefonnummer</label><input id="tel" name="telefon">
+    <label for="str">Straße und Hausnummer</label><input id="str" name="strasse">
+    <label for="plz">PLZ</label><input id="plz" name="plz" maxlength="5">
+    <label for="ort">Ort</label><input id="ort" name="ort">
+    <label for="land">Land</label>
+    <select id="land" name="land"><option value="">Bitte wählen</option><option value="at">Österreich</option><option value="de">Deutschland</option><option value="ch">Schweiz</option></select>
+    <label for="geb">Geburtsdatum</label><input id="geb" name="geburtsdatum" type="date">
+    <label for="nat">Staatsangehörigkeit</label><input id="nat" name="nationalitaet">
+    <h2>Berufliches</h2>
+    <label for="ag">Aktueller Arbeitgeber</label><input id="ag" name="arbeitgeber">
+    <label for="pos">Aktuelle Position</label><input id="pos" name="position_aktuell">
+    <label for="be">Berufserfahrung</label>
+    <select id="be" name="berufserfahrung"><option value="">Bitte wählen</option><option>0-2 Jahre</option><option>3-5 Jahre</option><option>6-10 Jahre</option><option>mehr als 10 Jahre</option></select>
+    <label for="gv">Gehaltsvorstellung (brutto/Jahr)</label><input id="gv" name="gehalt">
+    <label for="et">Frühester Eintrittstermin</label><input id="et" name="eintritt">
+    <label for="kf">Kündigungsfrist</label><input id="kf" name="kuendigungsfrist">
+    <label for="lv">Lebenslauf*</label><input id="lv" name="lebenslauf" type="file" required>
+    <label for="as">Anschreiben</label><input id="as" name="anschreiben" type="file">
+    <label><input type="checkbox" name="datenschutz" required> Ich habe die Datenschutzerklärung gelesen und bin einverstanden.</label>
+    <button type="submit">Bewerbung absenden</button>
+  </form>
+</body>
+</html>

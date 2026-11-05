@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<body>
+<div id="application">
+  <form id="application_form" action="https://boards.greenhouse.io/northwind/jobs/4567890" method="post">
+    <div id="main_fields">
+      <div class="field"><label for="first_name">First Name <span class="asterisk">*</span></label><input type="text" id="first_name" name="job_application[first_name]" aria-required="true"></div>
+      <div class="field"><label for="last_name">Last Name <span class="asterisk">*</span></label><input type="text" id="last_name" name="job_application[last_name]" aria-required="true"></div>
+      <div class="field"><label for="email">Email <span class="asterisk">*</span></label><input type="text" id="email" name="job_application[email]" aria-required="true"></div>
+      <div class="field"><label for="phone">Phone</label><input type="text" id="phone" name="job_application[phone]"></div>
+      <div class="field"><label for="job_application_location">Location (City)</label><input type="text" id="job_application_location" name="job_application[location]" autocomplete="off"></div>
+      <div class="field"><label>Resume/CV <span class="asterisk">*</span></label><input type="file" id="resume" name="job_application[resume]"></div>
+    </div>
+    <div id="custom_fields">
+      <div class="field"><label for="q_li">LinkedIn Profile</label><input type="text" id="q_li" name="job_application[answers_attributes][0][text_value]"></div>
+      <div class="field"><label for="q_web">Website</label><input type="text" id="q_web" name="job_application[answers_attributes][1][text_value]"></div>
+      <div class="field"><label for="q_auth">Are you legally authorized to work in Germany? *</label>
+        <select id="q_auth" name="job_application[answers_attributes][2][boolean_value]"><option value="">--</option><option value="1">Yes</option><option value="0">No</option></select></div>
+      <div class="field"><label for="q_spon">Will you now or in the future require sponsorship for employment visa status? *</label>
+        <select id="q_spon" name="job_application[answers_attributes][3][boolean_value]"><option value="">--</option><option value="1">Yes</option><option value="0">No</option></select></div>
+      <div class="field"><label for="q_hear">How did you hear about this job?</label><input type="text" id="q_hear" name="job_application[answers_attributes][4][text_value]"></div>
+    </div>
+    <input type="submit" value="Submit Application">
+  </form>
+</div>
+</body>
+</html>

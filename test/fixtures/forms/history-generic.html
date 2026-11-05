@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Apply: Platform Lead at Brightwave</title></head>
+<body>
+<!-- A company's own application form: two roles, one school, preferences, files and an open question. -->
+<form id="apply" action="/apply" method="post">
+  <h2>Personal information</h2>
+  <label for="fn">First name</label><input id="fn" name="first_name" required>
+  <label for="ln">Last name</label><input id="ln" name="last_name" required>
+  <label for="em">Email</label><input id="em" name="email" type="email" required>
+
+  <h2>Work experience</h2>
+  <div class="entry">
+    <label for="c1">Company</label><input id="c1" name="experience[0][company]">
+    <label for="t1">Job title</label><input id="t1" name="experience[0][title]">
+    <label for="s1">From (MM/YYYY)</label><input id="s1" name="experience[0][start]">
+    <label for="e1">To (MM/YYYY)</label><input id="e1" name="experience[0][end]">
+    <label><input type="checkbox" name="experience[0][current]"> I currently work here</label>
+  </div>
+  <div class="entry">
+    <label for="c2">Company</label><input id="c2" name="experience[1][company]">
+    <label for="t2">Job title</label><input id="t2" name="experience[1][title]">
+    <label for="s2">From (MM/YYYY)</label><input id="s2" name="experience[1][start]">
+    <label for="e2">To (MM/YYYY)</label><input id="e2" name="experience[1][end]">
+    <label><input type="checkbox" name="experience[1][current]"> I currently work here</label>
+  </div>
+
+  <h2>Education</h2>
+  <label for="u1">University</label><input id="u1" name="education[0][school]">
+  <label for="d1">Degree</label>
+  <select id="d1" name="education[0][degree]"><option value="">Please select</option><option>High school</option><option>Bachelor's degree</option><option>Master's degree</option><option>PhD</option></select>
+  <label for="f1">Field of study</label><input id="f1" name="education[0][field]">
+  <label for="g1">Graduation year</label>
+  <select id="g1" name="education[0][end_year]"><option value="">Year</option><option>2014</option><option>2013</option><option>2012</option><option>2011</option><option>2010</option></select>
+
+  <h2>Skills and preferences</h2>
+  <label for="sk">Skills</label><input id="sk" name="skills">
+  <label for="lang">Which languages do you speak?</label>
+  <select id="lang" name="languages" multiple><option>English</option><option>German</option><option>French</option><option>Spanish</option></select>
+  <fieldset>
+    <legend>Preferred work arrangement</legend>
+    <label><input type="checkbox" name="arrangement" value="remote"> Remote</label>
+    <label><input type="checkbox" name="arrangement" value="hybrid"> Hybrid</label>
+    <label><input type="checkbox" name="arrangement" value="onsite"> On-site</label>
+  </fieldset>
+  <fieldset>
+    <legend>Are you willing to relocate?</legend>
+    <label><input type="radio" name="relocate" value="yes"> Yes</label>
+    <label><input type="radio" name="relocate" value="no"> No</label>
+  </fieldset>
+  <label for="sal">Expected salary (EUR per year)</label><input id="sal" name="salary">
+  <label for="np">Notice period</label><input id="np" name="notice">
+
+  <h2>Documents</h2>
+  <label for="cv">CV</label><input id="cv" name="cv" type="file" accept=".pdf">
+  <label for="cl">Cover letter</label><input id="cl" name="cover_letter_file" type="file" accept=".pdf,.docx">
+  <label for="why">Why do you want to join Brightwave?</label><textarea id="why" name="why"></textarea>
+
+  <button type="submit">Submit application</button>
+</form>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "name": "careeros-companion",
+  "version": "0.1.0",
+  "private": true,
+  "description": "CareerOS Companion: the CareerOS browser extension (Chrome, Edge; Manifest V3)",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/build.mjs --mode development --watch",
+    "build": "node scripts/build.mjs --mode production",
+    "build:dev": "node scripts/build.mjs --mode development",
+    "build:edge": "node scripts/build.mjs --mode production --target edge",
+    "package": "node scripts/build.mjs --mode production && node scripts/package.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "node scripts/build.mjs --mode development --e2e && playwright test",
+    "test:live": "CAREEROS_LIVE=1 vitest run test/live",
+    "package:edge": "node scripts/build.mjs --mode production --target edge && node scripts/package.mjs --target edge",
+    "build:sideload": "node scripts/build.mjs --mode production --sideload"
+  },
+  "dependencies": {
+    "@fontsource-variable/hanken-grotesk": "^5.3.0",
+    "lucide-react": "1.65.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/chrome": "^0.3.7",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "6.1.2",
+    "fake-indexeddb": "^6.2.7",
+    "jsdom": "30.1.3",
+    "tailwindcss": "^4.3.3",
+    "typescript": "5.9.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  },
+  "packageManager": "pnpm@11.11.0"
+}

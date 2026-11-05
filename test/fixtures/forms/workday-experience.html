@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<body>
+<!-- Workday's "My Experience" step (ids as on current Workday forms; simplified). No name or email on this step. -->
+<div data-automation-id="applyFlowPage">
+  <h2 data-automation-id="pageHeader">My Experience</h2>
+  <div role="group" aria-labelledby="we-1">
+    <h4 id="we-1">Work Experience 1</h4>
+    <label for="workExperience-1--jobTitle">Job Title</label><input type="text" id="workExperience-1--jobTitle">
+    <label for="workExperience-1--companyName">Company</label><input type="text" id="workExperience-1--companyName">
+    <label for="workExperience-1--location">Location</label><input type="text" id="workExperience-1--location">
+    <label for="workExperience-1--currentlyWorkHere">I currently work here</label><input type="checkbox" id="workExperience-1--currentlyWorkHere">
+    <label for="workExperience-1--startDate-dateSectionMonth-input">Month</label><input type="text" id="workExperience-1--startDate-dateSectionMonth-input" maxlength="2">
+    <label for="workExperience-1--startDate-dateSectionYear-input">Year</label><input type="text" id="workExperience-1--startDate-dateSectionYear-input" maxlength="4">
+    <label for="workExperience-1--roleDescription">Role Description</label><textarea id="workExperience-1--roleDescription"></textarea>
+  </div>
+  <div role="group" aria-labelledby="we-2">
+    <h4 id="we-2">Work Experience 2</h4>
+    <label for="workExperience-2--jobTitle">Job Title</label><input type="text" id="workExperience-2--jobTitle">
+    <label for="workExperience-2--companyName">Company</label><input type="text" id="workExperience-2--companyName">
+    <label for="workExperience-2--currentlyWorkHere">I currently work here</label><input type="checkbox" id="workExperience-2--currentlyWorkHere">
+    <label for="workExperience-2--startDate-dateSectionMonth-input">Month</label><input type="text" id="workExperience-2--startDate-dateSectionMonth-input" maxlength="2">
+    <label for="workExperience-2--startDate-dateSectionYear-input">Year</label><input type="text" id="workExperience-2--startDate-dateSectionYear-input" maxlength="4">
+    <label for="workExperience-2--endDate-dateSectionMonth-input">Month</label><input type="text" id="workExperience-2--endDate-dateSectionMonth-input" maxlength="2">
+    <label for="workExperience-2--endDate-dateSectionYear-input">Year</label><input type="text" id="workExperience-2--endDate-dateSectionYear-input" maxlength="4">
+  </div>
+  <div role="group" aria-labelledby="ed-1">
+    <h4 id="ed-1">Education 1</h4>
+    <label for="education-1--schoolName">School or University</label><input type="text" id="education-1--schoolName">
+    <label id="lbl-deg">Degree</label>
+    <button type="button" id="education-1--degree" aria-haspopup="listbox" aria-labelledby="lbl-deg" aria-controls="deg-list">Select One</button>
+    <ul role="listbox" id="deg-list" hidden>
+      <li role="option">High School Diploma</li><li role="option">Bachelor's Degree</li><li role="option">Master's Degree</li><li role="option">Doctorate</li>
+    </ul>
+    <label for="education-1--fieldOfStudy">Field of Study</label><input type="text" id="education-1--fieldOfStudy">
+    <label for="education-1--lastYearAttended-dateSectionYear-input">To (Actual or Expected)</label><input type="text" id="education-1--lastYearAttended-dateSectionYear-input" maxlength="4">
+  </div>
+  <label for="resume">Upload a file</label><input type="file" id="resume" data-automation-id="file-upload-input-ref">
+</div>
+<script>
+{
+  // The list opens on a press and closes after a choice, like the real widget.
+  const btn = document.getElementById("education-1--degree");
+  const list = document.getElementById("deg-list");
+  btn.addEventListener("mousedown", () => { list.hidden = false; });
+  list.addEventListener("click", (e) => {
+    const o = e.target.closest("[role=option]");
+    if (!o) return;
+    btn.textContent = o.textContent;
+    list.hidden = true;
+  });
+}
+</script>
+</body>
+</html>
