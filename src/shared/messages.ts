@@ -1,6 +1,6 @@
 /**
  * Messages between the extension's pages (popup, side panel, options) and the background
- * service worker, which alone holds tokens and talks to CareerOS. Every request is
+ * service worker, which alone holds tokens and talks to GetCareer. Every request is
  * validated here before it is handled; anything malformed is dropped.
  */
 import type {

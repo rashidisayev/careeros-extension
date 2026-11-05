@@ -1,9 +1,9 @@
-# CareerOS Companion — API integration
+# GetCareer Companion — API integration
 
-The extension calls the CareerOS API at `<CAREEROS_URL>/api/v1` (production:
-`https://career.isayev.app/api/v1`). Only the service worker calls it
+The extension calls the GetCareer API at `<GETCAREER_URL>/api/v1` (production:
+`https://getcareer.io/api/v1`). Only the service worker calls it
 (`src/background/http.ts`, `api.ts`). The endpoints the extension uses are listed below;
-everything else is the existing API in `docs/API.md` in the CareerOS repo.
+everything else is the existing API in `docs/API.md` in the GetCareer repo.
 
 ## Request conventions
 
@@ -52,7 +52,7 @@ Everything the extension needs after connecting, cached for 5 minutes:
 {
   "api_version": 1,
   "min_extension_version": "0.1.0",
-  "app_url": "https://career.isayev.app",
+  "app_url": "https://getcareer.io",
   "user": { "id": "…", "email": "…", "full_name": "…" },
   "capabilities": {
     "ai_available": true, "ai_consent": true,
@@ -77,7 +77,7 @@ Everything the extension needs after connecting, cached for 5 minutes:
 
 `features` is the only source of feature access. The extension shows a feature only when it
 is enabled, and shows the reason when it isn't (no career direction → "Set up a career direction
-in CareerOS to see how well jobs fit."). `features_for()` in `app/extension/service.py` is the single place where
+in GetCareer to see how well jobs fit."). `features_for()` in `app/extension/service.py` is the single place where
 a future entitlement service plugs in. Today every implemented feature is on, and only
 prerequisites switch one off. The extension contains no plan names, limits or prices.
 
@@ -102,7 +102,7 @@ It is rate-limited per user (`extension_autofill_per_hour`, default 600) and ret
 }
 ```
 
-`basis: "derived"` means CareerOS worked the value out (first and last name split from a
+`basis: "derived"` means GetCareer worked the value out (first and last name split from a
 two-part full name, the city from "Berlin, Germany", the current employer when several
 positions are current). AutoFill only suggests derived values; it never fills them without
 the user ticking them. Keys: `email`, `full_name`, `first_name`, `last_name`,
@@ -192,7 +192,7 @@ The import gets `method = "extension"`, and the same page captured again within 
 returns the same import (double-click safe).
 
 The worker (`_from_capture` in `app/job_imports/service.py`) never fetches the page. It
-uses the catalog job if CareerOS already lists the posting; otherwise JSON-LD (stated
+uses the catalog job if GetCareer already lists the posting; otherwise JSON-LD (stated
 facts), adapter fields (`explicit` → stated, `inferred` → interpreted), meta tags and the
 page text. AI reads only this text, and only with the user's AI consent. Fewer than 150
 characters of description and no JobPosting gives `needs_text` with `no_content`, and the
@@ -218,11 +218,11 @@ deliberately not used. The extension never changes an existing application.
 |---|---|
 | `platform_restricted` | Restricted pages are recognised before any call and explain the platform's rule; the side panel offers saving selected text. If the server refuses a capture, its message (which points to selecting the text) is shown |
 | `possible_duplicate` (409 on save) | Duplicate panel: *Open the existing application* or *Save as a separate application* |
-| Import `needs_text` (any reason: `no_content`, `blocked_by_robots`, …) | "CareerOS couldn't read this posting" with the server's message and the paste form |
+| Import `needs_text` (any reason: `no_content`, `blocked_by_robots`, …) | "GetCareer couldn't read this posting" with the server's message and the paste form |
 | Import `failed` | The same, plus *Try again* (`/retry`) |
 | `invalid_session` (401 after one refresh) | Connect screen |
 | `update_required` (from `min_extension_version`) | Update notice instead of the UI |
-| `ai_consent_required` (suggested answers) | "Allow AI processing in your CareerOS settings to get suggested answers." with a link to the settings |
+| `ai_consent_required` (suggested answers) | "Allow AI processing in your GetCareer settings to get suggested answers." with a link to the settings |
 | 404 on `PUT /extension/autofill/history/{id}` | The entry was deleted meanwhile: a new one is started |
 | Anything else | The API's message as is, or the extension's message for network errors |
 

@@ -94,7 +94,7 @@ export function useTabState(tabId: number | null, enabled: boolean): Async<TabSt
 const POLL_MS = 1200;
 const SLOW_AFTER_MS = 60_000;
 
-/** An import, polled while CareerOS is still reading it. */
+/** An import, polled while GetCareer is still reading it. */
 export function useImport(importId: string | null): Async<ImportOut> & { slow: boolean; set: (i: ImportOut) => void } {
   const [data, setData] = useState<ImportOut | null>(null);
   const [error, setError] = useState<ErrorInfo | null>(null);

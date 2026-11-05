@@ -117,7 +117,7 @@ describe("scan", () => {
     expect(chrome.scripting.executeScript).not.toHaveBeenCalled();
   });
 
-  it("follows CareerOS: no AutoFill when the account doesn't have the feature", async () => {
+  it("follows GetCareer: no AutoFill when the account doesn't have the feature", async () => {
     await connected();
     tab(PAGE);
     api(null);

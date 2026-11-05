@@ -1,6 +1,6 @@
 /**
- * Connecting the extension to a CareerOS account: an OAuth 2.0 authorization-code flow with
- * PKCE (S256). The user approves on the CareerOS website (/connect/extension), signed in the
+ * Connecting the extension to a GetCareer account: an OAuth 2.0 authorization-code flow with
+ * PKCE (S256). The user approves on the GetCareer website (/connect/extension), signed in the
  * way they always are, in a window the browser opens for chrome.identity. The website hands
  * back a one-time code to https://<extension-id>.chromiumapp.org/careeros, which only this
  * extension receives; the code is useless without the verifier, which never leaves here.
@@ -18,7 +18,7 @@ export const REDIRECT_PATH = "careeros";
 
 export function clientName(): string {
   const browser = BUILD_TARGET === "edge" ? "Edge" : "Chrome";
-  return `CareerOS Companion ${EXTENSION_VERSION} · ${browser}`;
+  return `GetCareer Companion ${EXTENSION_VERSION} · ${browser}`;
 }
 
 export function connectUrl(redirectUri: string, challenge: string, state: string): string {

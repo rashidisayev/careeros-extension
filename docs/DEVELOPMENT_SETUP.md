@@ -1,15 +1,15 @@
-# CareerOS Companion — Development setup
+# GetCareer Companion — Development setup
 
 ## Prerequisites
 
 - Node.js 20+ and pnpm (as for `apps/web`).
-- The CareerOS stack running locally (`make up` in `~/Desktop/careeros`), so the website is at
+- The GetCareer stack running locally (`make up` in `~/Desktop/careeros`), so the website is at
   `http://localhost:3000` and proxies `/api/v1` to the API. Run `make migrate` once for the
   extension migration (`7c2e5a91b4d0`).
 - Chrome 116+ or Edge 116+.
 
 The extension is a standalone project in `~/Desktop/careeros-extension`, separate from the
-CareerOS repo (`~/Desktop/careeros`). It has its own `package.json` and lockfile.
+GetCareer repo (`~/Desktop/careeros`). It has its own `package.json` and lockfile.
 
 ```sh
 cd careeros-extension
@@ -30,20 +30,20 @@ pnpm dev                  # the same, rebuilding on every change
    fixed public key (`scripts/dev-public-key.txt`), so every developer gets the same id and
    the API accepts its sign-in redirect. With `EXTENSION_ALLOWED_IDS` empty, any id is
    accepted in development.
-4. Pin *CareerOS Companion (dev)* and click it on a job page. **Connect to CareerOS** opens
+4. Pin *GetCareer Companion (dev)* and click it on a job page. **Connect to GetCareer** opens
    the local website.
 
 After `pnpm dev` rebuilds, click the reload icon on the extension's card (or reopen the
 popup for UI-only changes). The service worker's console is under **Inspect views: service
 worker**.
 
-## Use it with production (career.isayev.app) without the store
+## Use it with production (getcareer.io) without the store
 
 ```sh
 pnpm build:sideload       # production build into dist, with the fixed id
 ```
 
-Load `dist` unpacked as above. It talks to `https://career.isayev.app` and keeps the id
+Load `dist` unpacked as above. It talks to `https://getcareer.io` and keeps the id
 `ajbdeolccbgjinhdmllogiefhmcogpma`, which production allows (`EXTENSION_ALLOWED_IDS` in the
 NAS `.env`). `pnpm build`, `pnpm package` and `pnpm build:dev` overwrite `dist`; run
 `pnpm build:sideload` again afterwards. `package.mjs` refuses to zip a sideload build.
@@ -58,14 +58,14 @@ For local development in Edge, load `dist` (the development build) in `edge://ex
 with **Developer mode** on. It has the same id as in Chrome. The Edge build only changes the
 client name the extension reports ("· Edge").
 
-## Pointing at another CareerOS
+## Pointing at another GetCareer
 
-The CareerOS URL is fixed at build time, so tokens can only go to that origin:
+The GetCareer URL is fixed at build time, so tokens can only go to that origin:
 
 | Build | Default | Override |
 |---|---|---|
-| `pnpm build:dev`, `pnpm dev` | `http://localhost:3000` | `CAREEROS_URL=https://staging.example pnpm build:dev` |
-| `pnpm build`, `pnpm build:edge`, `pnpm package` | `https://career.isayev.app` | `CAREEROS_URL=… pnpm build` |
+| `pnpm build:dev`, `pnpm dev` | `http://localhost:3000` | `GETCAREER_URL=https://staging.example pnpm build:dev` |
+| `pnpm build`, `pnpm build:edge`, `pnpm package` | `https://getcareer.io` | `GETCAREER_URL=… pnpm build` |
 
 The URL sets the API base, `host_permissions` and the CSP `connect-src` together. For a
 server other than localhost, add the extension's id to that server's
@@ -90,7 +90,7 @@ restart it after backend code changes too (`docker compose restart worker`).
 | `pnpm dev` | Development build with watch |
 | `pnpm build:dev` | Development build (`dist`) |
 | `pnpm build` | Production build (`dist`) |
-| `pnpm build:sideload` | Production build with the fixed id, for loading unpacked against career.isayev.app |
+| `pnpm build:sideload` | Production build with the fixed id, for loading unpacked against getcareer.io |
 | `pnpm build:edge` | Production build for Edge (`dist-edge`) |
 | `pnpm package` / `pnpm package:edge` | Production build and zip into `release/` |
 | `pnpm typecheck` | TypeScript |
@@ -127,7 +127,7 @@ careeros-extension/
   `parseRequest`.
 - New API fields: add them to `src/shared/api-types.ts` by hand from the API schemas, and to
   the live test if the extension depends on them.
-- Styling: the CareerOS tokens in `src/pages/styles.css` (copied from
+- Styling: the GetCareer tokens in `src/pages/styles.css` (copied from
   `apps/web/app/globals.css`; keep them in sync) and `DESIGN.md`. Captions are at least
   12 px, controls 36 px, with one focus ring.
 - Settings shape changes: bump `SETTINGS_VERSION` and add a migration step.
@@ -138,9 +138,9 @@ careeros-extension/
 
 | Symptom | Cause / fix |
 |---|---|
-| "This browser extension isn't allowed to connect to CareerOS." | The id isn't in `EXTENSION_ALLOWED_IDS` (or the API runs with `ENVIRONMENT=production` and the list is empty) |
-| The connect window asks you to sign in | Expected when this browser profile isn't signed in to CareerOS: the window uses the profile's cookies. Sign in on the same origin as the build (`localhost`, not `127.0.0.1`) to skip it next time |
-| "CareerOS can't be reached" | The stack isn't running, or the build points at another URL (Options → Account shows the CareerOS host the build uses) |
-| The side panel says "Click the CareerOS icon to read this page" | Expected after switching tabs with the panel open (`activeTab` is per click); click the icon or allow the site |
+| "This browser extension isn't allowed to connect to GetCareer." | The id isn't in `EXTENSION_ALLOWED_IDS` (or the API runs with `ENVIRONMENT=production` and the list is empty) |
+| The connect window asks you to sign in | Expected when this browser profile isn't signed in to GetCareer: the window uses the profile's cookies. Sign in on the same origin as the build (`localhost`, not `127.0.0.1`) to skip it next time |
+| "GetCareer can't be reached" | The stack isn't running, or the build points at another URL (Options → Account shows the GetCareer host the build uses) |
+| The side panel says "Click the GetCareer icon to read this page" | Expected after switching tabs with the panel open (`activeTab` is per click); click the icon or allow the site |
 | Imports stay at "Reading the posting" | The Celery worker isn't running or runs old code: `docker compose restart worker` |
 | Styles missing after adding a new folder | Tailwind scans from `src/pages`; `@source "../"` in `styles.css` covers `src/**` |

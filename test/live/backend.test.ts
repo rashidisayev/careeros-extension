@@ -1,5 +1,5 @@
 /**
- * End-to-end against a running CareerOS (default http://localhost:3000, the dev build's
+ * End-to-end against a running GetCareer (default http://localhost:3000, the dev build's
  * server): the extension's own background code connects, reads, saves, checks status,
  * refreshes and disconnects. A throwaway account is registered and deleted afterwards.
  *
@@ -36,7 +36,7 @@ function remember(res: Response) {
   }
 }
 
-/** A request as the CareerOS website makes it: cookies + CSRF header. */
+/** A request as the GetCareer website makes it: cookies + CSRF header. */
 async function web(path: string, init: { method?: string; body?: unknown } = {}): Promise<Response> {
   const res = await fetch(`${API_BASE}${path}`, {
     method: init.method ?? "GET",
@@ -91,7 +91,7 @@ afterAll(async () => {
   expect(res.status).toBe(204);
 });
 
-describe("CareerOS backend, through the extension's own code", () => {
+describe("GetCareer backend, through the extension's own code", () => {
   it("connects with the PKCE code flow and gets its own session", async () => {
     vi.mocked(chrome.identity.launchWebAuthFlow).mockImplementation(async ({ url }) => {
       const q = new URL(url).searchParams;
@@ -113,7 +113,7 @@ describe("CareerOS backend, through the extension's own code", () => {
     expect(tokens.user.email).toBe(EMAIL);
     const sessions = (await (await web("/auth/extension/sessions")).json()) as { id: string; client_name: string }[];
     expect(sessions.map((s) => s.id)).toContain(tokens.session_id);
-    expect(sessions[0]?.client_name).toMatch(/^CareerOS Companion/);
+    expect(sessions[0]?.client_name).toMatch(/^GetCareer Companion/);
   });
 
   it("reads bootstrap: features from the server, no plan logic in the extension", async () => {
@@ -123,7 +123,7 @@ describe("CareerOS backend, through the extension's own code", () => {
     expect(s.updateRequired).toBe(false);
     expect(s.bootstrap?.features.save_job?.enabled).toBe(true);
     expect(s.bootstrap?.entitlements.source).toBe("none");
-    // The extension's copy of the list must match the API's, or pages could be read that CareerOS refuses.
+    // The extension's copy of the list must match the API's, or pages could be read that GetCareer refuses.
     expect(s.bootstrap?.restricted_platforms.map((p) => p.key).sort()).toEqual([...RESTRICTED_KEYS].sort());
   });
 

@@ -43,7 +43,7 @@ describe("connect URL and redirect", () => {
     expect(url.origin + url.pathname).toBe("http://localhost:3000/connect/extension");
     expect(url.searchParams.get("code_challenge_method")).toBe("S256");
     expect(url.searchParams.get("redirect_uri")).toBe(REDIRECT);
-    expect(url.searchParams.get("client")).toMatch(/^CareerOS Companion \d/);
+    expect(url.searchParams.get("client")).toMatch(/^GetCareer Companion \d/);
   });
 
   it.each([
@@ -137,7 +137,7 @@ describe("disconnect", () => {
     expect(await tokenStore.session()).toBeNull();
   });
 
-  it("forgets the session even when CareerOS can't be reached", async () => {
+  it("forgets the session even when GetCareer can't be reached", async () => {
     await tokenStore.save(tokens(1));
     vi.stubGlobal("fetch", vi.fn(async () => { throw new TypeError("offline"); }));
     await disconnect();

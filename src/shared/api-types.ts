@@ -1,5 +1,5 @@
 /**
- * The parts of the CareerOS API the extension uses, typed after the backend's Pydantic
+ * The parts of the GetCareer API the extension uses, typed after the backend's Pydantic
  * schemas (apps/api/app/<module>/schemas.py). Keep in step with docs/API_INTEGRATION.md.
  */
 

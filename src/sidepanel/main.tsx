@@ -138,7 +138,7 @@ function Panel() {
               ) : paste ? (
                 <PasteForm
                   title="Paste the job description"
-                  intro="CareerOS reads the details from the text; you check them before saving."
+                  intro="GetCareer reads the details from the text; you check them before saving."
                   onSubmit={async (text) => {
                     await send({ type: "import.fromText", tabId, url: url && /^https?:/.test(url) ? url : null, text });
                     setPaste(false);

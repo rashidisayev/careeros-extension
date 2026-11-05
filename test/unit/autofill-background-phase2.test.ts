@@ -1,7 +1,7 @@
 /**
  * The service worker's side of AutoFill Phase 2 and 3: documents fetched only for file
  * fields and only on Fill, suggested answers, saved answers, the history entry kept per
- * application, and usage counts without form values. CareerOS is a fetch stub.
+ * application, and usage counts without form values. GetCareer is a fetch stub.
  */
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createRegistry, detectFields } from "../../src/autofill/detector";
@@ -109,7 +109,7 @@ beforeEach(async () => {
 });
 
 describe("documents", () => {
-  it("asks CareerOS for documents only when the form has a file field", async () => {
+  it("asks GetCareer for documents only when the form has a file field", async () => {
     await connected();
     tab(PAGE, "history-generic.html");
     let calls = api();
@@ -186,7 +186,7 @@ describe("history", () => {
     expect(session).not.toContain("Anna\"");
   });
 
-  it("keeps nothing in CareerOS when the history is off", async () => {
+  it("keeps nothing in GetCareer when the history is off", async () => {
     await connected();
     await saveSettings({ autofill: { ...DEFAULT_AUTOFILL, history: false } });
     tab();
@@ -262,7 +262,7 @@ describe("messages", () => {
     expect(parseRequest({ type: "autofill.historyDelete" })).toEqual({ type: "autofill.historyDelete" });
   });
 
-  it("checks file values: a CareerOS reference and a plain file name", () => {
+  it("checks file values: a GetCareer reference and a plain file name", () => {
     const fill = (value: unknown) => ({ type: "autofill.fill", tabId: 7, pageUrl: PAGE, items: [{ frameId: 0, fieldId: "f1", frameOrigin: "https://x.example", value, overwrite: false }], attention: [] });
     expect(parseRequest(fill({ kind: "file", ref: CV_REF, format: "pdf", name: "CV.pdf" }))).not.toBeNull();
     expect(parseRequest(fill({ kind: "file", ref: "https://evil.example/x", format: "pdf", name: "CV.pdf" }))).toBeNull();

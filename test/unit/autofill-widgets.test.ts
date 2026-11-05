@@ -1,6 +1,6 @@
 /**
  * The executor for Phase 2 values: entries picked from list widgets, several options of a
- * multi-select or checkbox group, and files attached from CareerOS. The fixtures' own scripts
+ * multi-select or checkbox group, and files attached from GetCareer. The fixtures' own scripts
  * open and fill their lists, as the vendors' widgets do.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";

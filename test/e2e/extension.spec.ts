@@ -1,5 +1,5 @@
 /**
- * The real extension in Chromium against a running CareerOS:
+ * The real extension in Chromium against a running GetCareer:
  *   connect (the real chrome.identity window and the website's connect page, when the browser
  *   exposes that window; otherwise the same API calls), read a job page, review and save in
  *   the side panel, see the status, and the popup. Screenshots go to test-results/screens.
@@ -139,18 +139,18 @@ test("loads with the expected id, permissions and no errors", async () => {
 test("not connected: the popup offers to connect", async () => {
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
-  await expect(popup.getByRole("heading", { name: "Connect to your CareerOS account" })).toBeVisible();
-  await expect(popup.getByRole("button", { name: "Connect to CareerOS" })).toBeEnabled();
+  await expect(popup.getByRole("heading", { name: "Connect to your GetCareer account" })).toBeVisible();
+  await expect(popup.getByRole("button", { name: "Connect to GetCareer" })).toBeEnabled();
   await popup.screenshot({ path: `${SHOTS}/popup-connect-dark.png` });
   await snapshot(popup, "popup-connect-dark");
   await popup.close();
 });
 
-test("connects through the CareerOS website", async () => {
+test("connects through the GetCareer website", async () => {
   const options = await context.newPage();
   await options.goto(`chrome-extension://${extensionId}/options.html`);
   const authWindow = context.waitForEvent("page", { timeout: 10_000 }).catch(() => null);
-  await options.getByRole("button", { name: "Connect to CareerOS" }).click();
+  await options.getByRole("button", { name: "Connect to GetCareer" }).click();
   const auth = await authWindow;
   if (auth) {
     // The real chrome.identity window: sign in on the website, then approve.
@@ -167,7 +167,7 @@ test("connects through the CareerOS website", async () => {
     const verifier = randomBytes(48).toString("base64url");
     const challenge = createHash("sha256").update(verifier).digest("base64url");
     const redirect = `https://${extensionId}.chromiumapp.org/careeros`;
-    const a = await web("/auth/extension/authorize", "POST", { redirect_uri: redirect, code_challenge: challenge, code_challenge_method: "S256", state: "e2e-state-0123456789", client_name: "CareerOS Companion e2e" });
+    const a = await web("/auth/extension/authorize", "POST", { redirect_uri: redirect, code_challenge: challenge, code_challenge_method: "S256", state: "e2e-state-0123456789", client_name: "GetCareer Companion e2e" });
     const code = new URL(((await a.json()) as { redirect_to: string }).redirect_to).searchParams.get("code");
     const t = await (await fetch(`${API}/auth/extension/token`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code, code_verifier: verifier, redirect_uri: redirect }) })).json();
     await sw.evaluate(async (tokens) => {
@@ -221,7 +221,7 @@ test("reads a job page, reviews and saves it in the side panel, then shows its s
   await panel.getByLabel("Department").fill("Platform");
   await expect(panel.getByText("Edited")).toBeVisible();
   await panel.getByLabel("Status").selectOption("to_apply");
-  await panel.getByRole("button", { name: "Save to CareerOS" }).click();
+  await panel.getByRole("button", { name: "Save to GetCareer" }).click();
   await expect(panel.getByText("Saved to your applications")).toBeVisible({ timeout: 30_000 });
   await panel.screenshot({ path: `${SHOTS}/panel-saved-dark.png`, fullPage: true });
   await snapshot(panel, "panel-saved-dark");
@@ -249,7 +249,7 @@ test("reads a job page, reviews and saves it in the side panel, then shows its s
   await panel.getByRole("button", { name: "Review and save as a separate application" }).click();
   await expect(panel.getByText("You may already be tracking this job")).toBeVisible({ timeout: 60_000 });
   await expect(panel.getByRole("button", { name: "Open the existing application" })).toBeVisible();
-  await expect(panel.getByRole("button", { name: "Save to CareerOS" })).toHaveCount(0);
+  await expect(panel.getByRole("button", { name: "Save to GetCareer" })).toHaveCount(0);
   await panel.screenshot({ path: `${SHOTS}/panel-duplicate-light.png`, fullPage: true });
   await snapshot(panel, "panel-duplicate-light");
   await panel.getByRole("button", { name: "Cancel" }).click();
@@ -272,7 +272,7 @@ test("a page that isn't a job says so and sends nothing", async () => {
 });
 
 test("AutoFill: fills an application form from the Career Profile, after review, and undoes it", async () => {
-  // The Career Profile in CareerOS is the only source of the values.
+  // The Career Profile in GetCareer is the only source of the values.
   const prof = await web("/career-profile", "PATCH", {
     given_name: "Erika",
     family_name: "Mustermann",
@@ -298,7 +298,7 @@ test("AutoFill: fills an application form from the Career Profile, after review,
   // The popup shows the contextual AutoFill card.
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/popup.html?tab=${tabId}`);
-  await expect(popup.getByRole("heading", { name: "CareerOS AutoFill" })).toBeVisible({ timeout: 20_000 });
+  await expect(popup.getByRole("heading", { name: "GetCareer AutoFill" })).toBeVisible({ timeout: 20_000 });
   await expect(popup.getByText("19 fields detected")).toBeVisible();
   await expect(popup.getByRole("button", { name: "Fill application" })).toBeVisible();
   await popup.screenshot({ path: `${SHOTS}/popup-autofill-dark.png` });
@@ -306,7 +306,7 @@ test("AutoFill: fills an application form from the Career Profile, after review,
 
   const panel = await context.newPage();
   await panel.goto(`chrome-extension://${extensionId}/sidepanel.html?tab=${tabId}`);
-  await expect(panel.getByRole("heading", { name: "CareerOS AutoFill" })).toBeVisible({ timeout: 20_000 });
+  await expect(panel.getByRole("heading", { name: "GetCareer AutoFill" })).toBeVisible({ timeout: 20_000 });
   await expect(panel.locator("html")).toHaveClass(/\bdark\b/); // the theme set at the end of the job test
   await expect(panel.getByText("11 fields ready to fill")).toBeVisible();
   await expect(panel.getByText("1 field needs your confirmation")).toBeVisible();
@@ -319,7 +319,7 @@ test("AutoFill: fills an application form from the Career Profile, after review,
   await expect(panel.getByRole("heading", { name: "Review AutoFill" })).toBeVisible();
   await expect(panel.getByLabel("Value for First name")).toHaveValue("Erika");
   await expect(panel.getByLabel("Value for Current employer")).toHaveValue("Nordlicht Payments");
-  await expect(panel.getByText("Sensitive or legal. CareerOS never fills this; answer it yourself.").first()).toBeVisible();
+  await expect(panel.getByText("Sensitive or legal. GetCareer never fills this; answer it yourself.").first()).toBeVisible();
   await panel.getByLabel("Value for City").fill("Potsdam");
   await panel.screenshot({ path: `${SHOTS}/panel-autofill-review-dark.png`, fullPage: true });
   await snapshot(panel, "panel-autofill-review-dark");
@@ -352,7 +352,7 @@ test("AutoFill: fills an application form from the Career Profile, after review,
   await expect(page.locator("#fn")).toHaveValue("");
   await expect(page.locator("#country")).toHaveValue("");
   await expect(page.locator("#ln")).toHaveValue("Mustermann-Weber");
-  await expect(panel.getByRole("heading", { name: "CareerOS AutoFill" })).toBeVisible();
+  await expect(panel.getByRole("heading", { name: "GetCareer AutoFill" })).toBeVisible();
   expect(submitted).toBe(false);
 });
 
@@ -400,14 +400,14 @@ test("AutoFill settings", async () => {
   const panel = await context.newPage();
   await panel.goto(`chrome-extension://${extensionId}/sidepanel.html?tab=${tabId}`);
   await expect(panel.getByText("No job posting found on this page")).toBeVisible({ timeout: 20_000 });
-  await expect(panel.getByRole("heading", { name: "CareerOS AutoFill" })).toHaveCount(0);
+  await expect(panel.getByRole("heading", { name: "GetCareer AutoFill" })).toHaveCount(0);
   await enabled.click();
   await expect(enabled).toBeChecked();
   await phone.click();
   await expect(phone).toBeChecked();
 });
 
-/** A minimal valid PDF, so CareerOS accepts the upload. */
+/** A minimal valid PDF, so GetCareer accepts the upload. */
 function tinyPdf(): Buffer {
   const objs = ["<< /Type /Catalog /Pages 2 0 R >>", "<< /Type /Pages /Kids [3 0 R] /Count 1 >>", "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 200 200] >>"];
   let body = "%PDF-1.4\n";
@@ -422,8 +422,8 @@ function tinyPdf(): Buffer {
   return Buffer.from(body, "latin1");
 }
 
-test("AutoFill: work history, a list widget, a CV from CareerOS, and the next step of the form", async () => {
-  // A second, earlier role and a degree in the Career Profile; a CV uploaded to CareerOS.
+test("AutoFill: work history, a list widget, a CV from GetCareer, and the next step of the form", async () => {
+  // A second, earlier role and a degree in the Career Profile; a CV uploaded to GetCareer.
   expect((await web("/career-profile/experience", "POST", { company: "Kiezbank", job_title: "Senior SRE", start_date: "2017-09-01", end_date: "2021-03-01" })).status).toBe(201);
   expect((await web("/career-profile/education", "POST", { institution: "TU Berlin", degree: "Master of Science", field_of_study: "Computer Science", start_year: 2011, graduation_year: 2013 })).status).toBe(201);
   const upload = new FormData();

@@ -7,7 +7,7 @@
  * - answers the user saved for a question or a kind of field (never anything else for
  *   sensitive questions),
  * - the target salary of the primary career direction (only with Preferences on),
- * - the CV or cover letter to attach (the one CareerOS prepared for this job first).
+ * - the CV or cover letter to attach (the one GetCareer prepared for this job first).
  */
 import { adapter, adapterForHost, type AtsAdapter } from "./adapters";
 import { classify } from "./classifier";
@@ -58,13 +58,13 @@ function host(url: string): string {
 }
 
 /**
- * An application form names at least three different things CareerOS knows (or two plus a
+ * An application form names at least three different things GetCareer knows (or two plus a
  * CV upload), and at least one of them identifies the applicant. A login (password, few
  * fields), a search box or a newsletter (email only) never qualifies.
  *
  * Later steps of a multi-step application don't ask for the name again: a step with an
  * employment history or education counts, and on a known ATS any step asking two things
- * CareerOS knows.
+ * GetCareer knows.
  */
 export function isApplicationGroup(group: FormGroup, fields: Classified[], knownAts = false): boolean {
   if (group.isSearch) return false;
@@ -194,7 +194,7 @@ function answerable(action: PlanAction, reasons: PlanReason[], kind: FieldDescri
 
 export type PlanExtras = {
   now?: number;
-  /** Documents CareerOS can attach for this page (null: not fetched or unavailable). */
+  /** Documents GetCareer can attach for this page (null: not fetched or unavailable). */
   documents?: DocumentsOut | null;
 };
 

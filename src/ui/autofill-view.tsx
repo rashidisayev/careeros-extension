@@ -1,11 +1,11 @@
 /**
- * CareerOS AutoFill in the side panel (and its summary in the popup): what the form on this
- * tab asks for, what CareerOS would fill from the Career Profile, the review where every
+ * GetCareer AutoFill in the side panel (and its summary in the popup): what the form on this
+ * tab asks for, what GetCareer would fill from the Career Profile, the review where every
  * value can be changed or left out, and the result with undo. Nothing is written into the
  * page before the user presses "Fill", and nothing is ever submitted.
  *
- * In the review the user can also attach a CV or cover letter from CareerOS, answer the
- * questions AutoFill leaves to them (and save an answer for next time), and ask CareerOS to
+ * In the review the user can also attach a CV or cover letter from GetCareer, answer the
+ * questions AutoFill leaves to them (and save an answer for next time), and ask GetCareer to
  * draft answers to open questions. Every one of those is unticked until the user ticks it.
  */
 import { CheckCircle2, ExternalLink, FileText, RefreshCw, Sparkles, Undo2 } from "lucide-react";
@@ -35,7 +35,7 @@ export type AutofillState = {
 };
 
 /**
- * Answers for this account: whether CareerOS drafts them (and why not), whether it keeps
+ * Answers for this account: whether GetCareer drafts them (and why not), whether it keeps
  * answers the user asks it to remember, and the user's settings. An older server offers neither.
  */
 export type AnswersAccess = { enabled: boolean; reason: string | null; remember: boolean; prefs: AutofillSettings["answers"] };
@@ -88,13 +88,13 @@ export function useAutofill(tabId: number | null, enabled: boolean): AutofillSta
 }
 
 const REASON: Record<PlanReason, string> = {
-  sensitive: "Sensitive or legal. CareerOS never fills this; answer it yourself.",
+  sensitive: "Sensitive or legal. GetCareer never fills this; answer it yourself.",
   preference: "Depends on this job. Answer it yourself.",
   consent: "Only you can give consent.",
   question: "A question for you to answer.",
   document: "Attach the file yourself.",
   missing_in_profile: "Not in your Career Profile.",
-  not_recognised: "CareerOS doesn't recognise this field.",
+  not_recognised: "GetCareer doesn't recognise this field.",
   has_value: "Already filled in on the page.",
   user_edited: "You changed this after AutoFill; it stays as you left it.",
   already_filled: "Filled by AutoFill.",
@@ -112,8 +112,8 @@ const REASON: Record<PlanReason, string> = {
   current_role: "Your current role: it has no end date.",
   date_assumed: "Check the date: the form's format or the day was assumed.",
   saved_answer: "Your saved answer. Tick it to use it here.",
-  preference_value: "From your job preferences in CareerOS. Tick it if it fits this job.",
-  salary_target: "Your target salary in CareerOS. Tick it to use it, or answer yourself.",
+  preference_value: "From your job preferences in GetCareer. Tick it if it fits this job.",
+  salary_target: "Your target salary in GetCareer. Tick it to use it, or answer yourself.",
   document_choice: "Attached only if you tick it.",
   replace_file: "A file is already attached. Tick to replace it.",
   list_choice: "Picked from the field's list. Check the choice.",
@@ -130,7 +130,7 @@ function Links({ onOpen }: { onOpen: (path: string) => void }) {
     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
       <Button variant="link" className="text-xs" onClick={() => onOpen("/profile")}>
         Review profile <ExternalLink className="size-3" aria-hidden />
-        <span className="sr-only">(opens CareerOS in a new tab)</span>
+        <span className="sr-only">(opens GetCareer in a new tab)</span>
       </Button>
       <Button variant="link" className="text-xs" onClick={openOptions}>
         Customize AutoFill
@@ -182,7 +182,7 @@ export function AutofillSummary({ plan, action, onOpen }: { plan: AutofillPlan; 
   return (
     <section aria-labelledby="autofill-title" className="grid gap-3 rounded-xl border bg-card p-4 shadow-card">
       <h2 id="autofill-title" className="flex items-center gap-2 text-[0.9375rem] font-semibold">
-        <Sparkles className="size-4 text-primary" aria-hidden /> CareerOS AutoFill
+        <Sparkles className="size-4 text-primary" aria-hidden /> GetCareer AutoFill
       </h2>
       <Counts plan={plan} />
       {action}
@@ -192,8 +192,8 @@ export function AutofillSummary({ plan, action, onOpen }: { plan: AutofillPlan; 
 }
 
 /**
- * What the user decided for one field. `remember`: save the answer in CareerOS for other
- * forms. `issues`: what CareerOS couldn't verify in a drafted answer.
+ * What the user decided for one field. `remember`: save the answer in GetCareer for other
+ * forms. `issues`: what GetCareer couldn't verify in a drafted answer.
  */
 type Choice = { on: boolean; value: FillValue | null; overwrite: boolean; remember?: boolean; issues?: string[]; drafted?: boolean };
 
@@ -360,7 +360,7 @@ function reasonText(item: PlanItem): string | null {
 
 /**
  * For a question left to the user: answer it here (it is then filled with the rest), have
- * CareerOS draft an answer to an open question, and save the answer for other forms.
+ * GetCareer draft an answer to an open question, and save the answer for other forms.
  */
 function Answer({
   item,
@@ -435,7 +435,7 @@ function Answer({
           ))}
         </ul>
       )}
-      {choice?.drafted && <p className="text-xs text-muted-foreground">Drafted by CareerOS from your profile. Read it, change it, then tick it to use it.</p>}
+      {choice?.drafted && <p className="text-xs text-muted-foreground">Drafted by GetCareer from your profile. Read it, change it, then tick it to use it.</p>}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
         {choice && answers.remember && (
           <label className="flex items-center gap-1.5">
@@ -549,8 +549,8 @@ function answerText(item: PlanItem, v: FillValue | null): string | null {
 }
 
 const AI_HINT: Record<string, string> = {
-  consent_required: "To get suggested answers to open questions, allow AI processing in your CareerOS settings.",
-  ai_unavailable: "Suggested answers aren't available on this CareerOS server.",
+  consent_required: "To get suggested answers to open questions, allow AI processing in your GetCareer settings.",
+  ai_unavailable: "Suggested answers aren't available on this GetCareer server.",
 };
 
 /** What happened after the fill besides the fields: answers saved for other forms. */
@@ -612,9 +612,9 @@ function Review({
             next[a.id] = { on: false, value: answerValue(item, a.answer), overwrite: false, issues: a.issues, drafted: true };
             said[a.id] = "";
           } else if (a.status === "declined") {
-            said[a.id] = "CareerOS doesn't draft answers to this kind of question. Answer it yourself.";
+            said[a.id] = "GetCareer doesn't draft answers to this kind of question. Answer it yourself.";
           } else {
-            said[a.id] = a.missing ? `CareerOS needs more from you to answer this: ${a.missing}` : "Your profile doesn't say enough to answer this. Answer it yourself.";
+            said[a.id] = a.missing ? `GetCareer needs more from you to answer this: ${a.missing}` : "Your profile doesn't say enough to answer this. Answer it yourself.";
           }
         }
         setChoices((c) => ({ ...c, ...next }));
@@ -783,7 +783,7 @@ function Review({
               </p>
             )
           )}
-          {answers.enabled && <p className="text-xs text-muted-foreground">Drafts use only your Career Profile and this job. CareerOS never drafts salary, legal or personal questions.</p>}
+          {answers.enabled && <p className="text-xs text-muted-foreground">Drafts use only your Career Profile and this job. GetCareer never drafts salary, legal or personal questions.</p>}
           {draftError && (
             <Alert tone="warning" title="No answers suggested">
               <p>{draftError.message}</p>
@@ -824,7 +824,7 @@ const FAILED: Record<string, string> = {
   too_long: "too long for the field",
   wrong_page: "the page changed",
   wrong_file_type: "the field doesn't take this file type",
-  file_unavailable: "CareerOS couldn't provide the file",
+  file_unavailable: "GetCareer couldn't provide the file",
   failed: "couldn't be written",
 };
 
@@ -880,7 +880,7 @@ function Result({
       </Alert>
       {outcome.saveFailed > 0 && (
         <Alert tone="warning" title={`${plural(outcome.saveFailed, "answer wasn't", "answers weren't")} saved`}>
-          <p>The fields were filled; CareerOS couldn't keep the answers for next time.</p>
+          <p>The fields were filled; GetCareer couldn't keep the answers for next time.</p>
         </Alert>
       )}
       {next && (

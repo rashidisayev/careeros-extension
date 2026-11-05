@@ -1,6 +1,6 @@
 /**
  * Starting and finishing a job import for a tab. An import is created only when the user
- * asks to save (button, menu, shortcut), never because a page was opened, so CareerOS (and
+ * asks to save (button, menu, shortcut), never because a page was opened, so GetCareer (and
  * its AI, where the user allowed it) only processes postings the user chose.
  */
 import type { ApplicationDetail, ImportOut, ImportSave } from "../shared/api-types";
@@ -22,7 +22,7 @@ export async function importFromPage(tabId: number): Promise<ImportOut> {
     const name = state.restricted?.name ?? "This site";
     throw new ExtensionError(
       "platform_restricted",
-      `${name} doesn't allow other services to read its job pages, so CareerOS doesn't. Select the job description on the page and save the selection, or paste it.`,
+      `${name} doesn't allow other services to read its job pages, so GetCareer doesn't. Select the job description on the page and save the selection, or paste it.`,
     );
   }
   if (state.kind === "no_access") throw new ExtensionError("no_access", messageFor("no_access"));
@@ -42,7 +42,7 @@ export async function importFromSelection(tabId: number, fallbackText?: string):
     if (!fallbackText) {
       throw new ExtensionError(
         "no_access",
-        "The extension can't read this tab yet. Right-click the selected text and choose “Save selected text as a job description”, or click the CareerOS icon first.",
+        "The extension can't read this tab yet. Right-click the selected text and choose “Save selected text as a job description”, or click the GetCareer icon first.",
       );
     }
   }

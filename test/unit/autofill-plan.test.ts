@@ -163,7 +163,7 @@ describe("planner: no invented or sensitive values", () => {
     }
   });
 
-  it("only suggests values CareerOS derived (first name from the full name)", () => {
+  it("only suggests values GetCareer derived (first name from the full name)", () => {
     const p = plan("simple-en.html", { ...ANNA, values: { ...ANNA.values, first_name: { value: "Anna", basis: "derived" } } });
     expect(byLabel(p.items, "First name")).toMatchObject({ action: "confirm", confidence: "medium", reasons: ["derived_value"] });
   });

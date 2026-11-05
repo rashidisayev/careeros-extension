@@ -110,13 +110,13 @@ describe("tab state", () => {
     expect((await tabState(7)).kind).toBe("no_access");
   });
 
-  it("doesn't read CareerOS itself", async () => {
+  it("doesn't read GetCareer itself", async () => {
     tab("http://localhost:3000/applications");
     expect((await tabState(7)).kind).toBe("careeros");
     expect(chrome.scripting.executeScript).not.toHaveBeenCalled();
   });
 
-  it("keeps the lookup out of the result when CareerOS fails, with the reason", async () => {
+  it("keeps the lookup out of the result when GetCareer fails, with the reason", async () => {
     await connected();
     tab("https://careers.northwind.example/jobs/4711-senior-sre");
     vi.stubGlobal("fetch", vi.fn(async () => json(500, {})));

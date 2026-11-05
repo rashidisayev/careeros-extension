@@ -1,13 +1,13 @@
-# CareerOS Companion — Authentication
+# GetCareer Companion — Authentication
 
-The extension signs in through the CareerOS website and receives its own session in the
+The extension signs in through the GetCareer website and receives its own session in the
 existing session system. There is no second identity system and no client secret in the
-extension. Passwords and Google sign-in happen only on the CareerOS website.
+extension. Passwords and Google sign-in happen only on the GetCareer website.
 
 ## Flow
 
 ```
-Extension (service worker)              Browser window                    CareerOS
+Extension (service worker)              Browser window                    GetCareer
 ──────────────────────────              ──────────────                    ────────
 verifier = random(48 bytes, base64url)
 challenge = base64url(SHA-256(verifier))
@@ -15,9 +15,9 @@ state = random(24 bytes)
 launchWebAuthFlow(interactive) ───────▶ /connect/extension?redirect_uri=
                                           https://<id>.chromiumapp.org/careeros
                                           &code_challenge=…&code_challenge_method=S256
-                                          &state=…&client=CareerOS Companion 0.1.0 · Chrome
+                                          &state=…&client=GetCareer Companion 0.1.0 · Chrome
                                         not signed in → /login?next=… (password or Google)
-                                        "Connect CareerOS Companion?"  [Connect] [Cancel]
+                                        "Connect GetCareer Companion?"  [Connect] [Cancel]
                                         POST /auth/extension/authorize ──────▶ cookie session + CSRF
                                                                                checks redirect URI and
                                                                                extension id, stores
@@ -49,7 +49,7 @@ Code: `src/background/auth.ts`, `pkce.ts`, `tokens.ts`, `vault.ts`; API
 | Code stored hashed, single use (`GETDEL`), 120 s TTL | API, Redis | Replay; reading codes from Redis |
 | Code bound to the redirect URI and challenge, compared in constant time | API | Code injection across extensions |
 | Redirect URI must be `https://<32 a–p>.chromiumapp.org/<path>` | API, web | Codes sent to any web origin (open redirect) |
-| Extension id allowlist (`EXTENSION_ALLOWED_IDS`); empty in production refuses all | API | Look-alike extensions connecting to CareerOS |
+| Extension id allowlist (`EXTENSION_ALLOWED_IDS`); empty in production refuses all | API | Look-alike extensions connecting to GetCareer |
 | `state` generated per attempt and compared on return | Extension | Login CSRF (a code from someone else's attempt) |
 | Explicit **Connect** click on the website, which names the extension and browser | Web | Silent connection |
 | Authorize needs the cookie session and the CSRF header | API | Cross-site requests minting codes |
@@ -102,10 +102,10 @@ Messages are in `src/shared/errors.ts`.
 |---|---|---|
 | User closes the window or clicks Cancel | `connect_cancelled` | A neutral note: "Connecting was cancelled. You can try again whenever you like." |
 | `access_denied`, a wrong `state`, a malformed code, or `invalid_grant` (expired, reused or mismatched code) | `connect_failed` | "Connecting didn't work. Try again." |
-| Extension id not on the allowlist | `extension_not_allowed` | The connect page: "This browser extension isn't allowed to connect to CareerOS." |
-| Refresh token revoked or expired | `invalid_session` | "Your connection to CareerOS ended. Connect again to continue." and the connect screen |
+| Extension id not on the allowlist | `extension_not_allowed` | The connect page: "This browser extension isn't allowed to connect to GetCareer." |
+| Refresh token revoked or expired | `invalid_session` | "Your connection to GetCareer ended. Connect again to continue." and the connect screen |
 | Server unreachable / offline / slow | `network_error` / `offline` / `timeout` | The matching message with a retry button |
-| Extension older than `EXTENSION_MIN_VERSION` | `update_required` | "This version of the extension is too old for CareerOS. Update it to continue." No further calls |
+| Extension older than `EXTENSION_MIN_VERSION` | `update_required` | "This version of the extension is too old for GetCareer. Update it to continue." No further calls |
 
 ## Configuration
 

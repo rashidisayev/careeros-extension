@@ -117,7 +117,7 @@ export const EDU_KEYS: FieldKey[] = ["edu_school", "edu_degree", "edu_field", "e
 
 /**
  * Keys an answer can be saved for, so it is offered on every form that asks the same thing
- * (CareerOS: SavedAnswerIn.field_key). Sensitive ones too: a saved answer is the user's own.
+ * (GetCareer: SavedAnswerIn.field_key). Sensitive ones too: a saved answer is the user's own.
  */
 export const REUSABLE_KEYS: FieldKey[] = [
   "nationality", "citizenship", "date_of_birth", "salutation", "gender", "ethnicity", "disability", "veteran_status",

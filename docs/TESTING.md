@@ -1,4 +1,4 @@
-# CareerOS Companion — Testing
+# GetCareer Companion — Testing
 
 Four layers, from fast to real. CI-safe layers use local fixture pages only. No test loads
 LinkedIn, Indeed or any other live job site.
@@ -33,9 +33,9 @@ besides the regenerated API types), the Chrome Web Store zip, and Impeccable (la
 | File | Tests | Covers |
 |---|---|---|
 | `extraction.test.ts` | 30 | Every fixture page: fields, provenance, detection confidence, JSON-LD over adapters over meta, salary only from `baseSalary`, gender markers removed from titles, size limits, data minimisation, restricted and non-http URLs return nothing |
-| `shared.test.ts` | 58 | Message validation (hostile shapes dropped), trusted senders, restricted platforms and posting URLs, settings migrations and downgrades, CareerOS paths only, version comparison, log redaction |
+| `shared.test.ts` | 58 | Message validation (hostile shapes dropped), trusted senders, restricted platforms and posting URLs, settings migrations and downgrades, GetCareer paths only, version comparison, log redaction |
 | `auth.test.ts` | 19 | PKCE (RFC 7636 example), connect URL, redirect parsing (wrong origin or path, state mismatch, `access_denied`, malformed codes), a closed window is "cancelled", token storage and expiry, refresh de-duplication and rotation, 401 → forgotten, network errors keep the session, disconnect with and without the server |
-| `tabs.test.ts` | 12 | Page kinds, restricted pages never scripted (posting URLs looked up, feeds and profiles not), no access, CareerOS itself, lookup failures; imports from the capture (not a server fetch), restricted refusal with instructions, selected text from a restricted page saved as pasted text, a failed popup save recorded for the panel |
+| `tabs.test.ts` | 12 | Page kinds, restricted pages never scripted (posting URLs looked up, feeds and profiles not), no access, GetCareer itself, lookup failures; imports from the capture (not a server fetch), restricted refusal with instructions, selected text from a restricted page saved as pasted text, a failed popup save recorded for the panel |
 | `http.test.ts` | 9 | Headers and no cookies, error envelope, `Retry-After` on 429, GET-only retries, timeouts, one refresh on 401, shared in-flight GETs, session-ended broadcast, capture body |
 | `autofill-classifier.test.ts` | 58 | English and German labels from the brief, `autocomplete`, names and ids (camelCase, brackets, ATS prefixes), placeholders and ARIA, ambiguity ("Company" is a suggestion), salutation by its options, skill-specific experience questions, preferences, full/first/last name, phone country code, newsletter boxes, fields about other people, open questions, every sensitive and legal question, lexicon merging and adding a language |
 | `autofill-plan.test.ts` | 28 | Each form fixture end to end: which forms are application forms, what is filled, confirmed, asked or kept, option matching (countries, ranges, yes/no), derived values, repeated fields, references, exclusions and categories, values that don't fit, unclear labels, missing profile fields |
@@ -81,7 +81,7 @@ Their scripts run in jsdom and in Chromium.
 
 ## Live API tests (`test/live/backend.test.ts`)
 
-They run only with `CAREEROS_LIVE=1` (set by `pnpm test:live`). They register a throwaway
+They run only with `GETCAREER_LIVE=1` (set by `pnpm test:live`). They register a throwaway
 account, connect through the real PKCE flow (the website's authorize call is made with that
 account's cookie session), and then:
 
@@ -105,7 +105,7 @@ which is deleted at the end:
 
 1. The extension loads with the expected id and permissions, and without errors.
 2. Not connected: the popup offers to connect.
-3. Connect through the CareerOS website: the real `chrome.identity` window, login form,
+3. Connect through the GetCareer website: the real `chrome.identity` window, login form,
    **Connect**.
 4. Read a fixture job page, review it in the side panel (tags, an edit marked *Edited*),
    save it, and see "Already in your applications" in the panel and popup. Saving again shows
@@ -120,7 +120,7 @@ which is deleted at the end:
    left empty; *Done* removes the outlines.
 8. AutoFill settings: excluding a field is saved; with AutoFill off, the side panel doesn't
    offer it.
-9. AutoFill on a two-step form, with two roles, a degree and a CV uploaded to CareerOS: the
+9. AutoFill on a two-step form, with two roles, a degree and a CV uploaded to GetCareer: the
    review shows the roles per entry and the CV and the country list unticked; after ticking
    them, the page holds both roles, the start date as MM/YYYY, "Germany" picked in the list
    widget, and the CV attached as a real file. After *Next*, the panel shows *New fields on

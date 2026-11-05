@@ -1,6 +1,6 @@
 /**
  * schema.org JobPosting from the page: JSON-LD first, microdata second. Only JobPosting
- * nodes are kept, pruned to the properties CareerOS reads and size-limited; the API parses
+ * nodes are kept, pruned to the properties GetCareer reads and size-limited; the API parses
  * them again with its own code (apps/api/app/job_imports/extract.py, from_jsonld).
  */
 import { readableText, tidy } from "./text";
@@ -64,7 +64,7 @@ export function findJobPostings(nodes: unknown[]): Node[] {
   return found;
 }
 
-/** Keep only the properties CareerOS reads, with strings and lists capped. */
+/** Keep only the properties GetCareer reads, with strings and lists capped. */
 export function prune(value: unknown, key = "", depth = 0): unknown {
   if (depth > 6) return undefined;
   if (typeof value === "string") {

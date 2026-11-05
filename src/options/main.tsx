@@ -40,7 +40,7 @@ function Account() {
       <dl className="grid grid-cols-[8rem_1fr] gap-y-2">
         <dt className="text-muted-foreground">Signed in as</dt>
         <dd className="min-w-0 truncate font-medium">{s.user.email}</dd>
-        <dt className="text-muted-foreground">CareerOS</dt>
+        <dt className="text-muted-foreground">GetCareer</dt>
         <dd className="min-w-0 truncate">{new URL(CAREEROS_URL).host}</dd>
       </dl>
       {confirming ? (
@@ -68,7 +68,7 @@ function Account() {
             </>
           }
         >
-          <p>The extension forgets your connection and CareerOS ends its session. Your saved applications stay in CareerOS.</p>
+          <p>The extension forgets your connection and GetCareer ends its session. Your saved applications stay in GetCareer.</p>
         </Alert>
       ) : (
         <div className="flex flex-wrap gap-2">
@@ -76,7 +76,7 @@ function Account() {
             Disconnect
           </Button>
           <Button variant="ghost" onClick={() => send({ type: "app.open", path: "/settings" }).catch(() => undefined)}>
-            Connected browsers in CareerOS <ExternalLink aria-hidden />
+            Connected browsers in GetCareer <ExternalLink aria-hidden />
             <span className="sr-only">(opens a new tab)</span>
           </Button>
         </div>
@@ -90,7 +90,7 @@ function SiteList() {
   const load = useCallback(() => {
     chrome.permissions
       .getAll()
-      // Only sites the user added; the manifest's own (CareerOS) access can't be removed.
+      // Only sites the user added; the manifest's own (GetCareer) access can't be removed.
       .then((p) => {
         const required = new Set(chrome.runtime.getManifest().host_permissions ?? []);
         setOrigins((p.origins ?? []).filter((o) => !required.has(o)));
@@ -231,7 +231,7 @@ function Select<T extends string>({ id, label, value, options, onChange, disable
   );
 }
 
-/** Loads a list from CareerOS (only while connected); `reload` after a change. */
+/** Loads a list from GetCareer (only while connected); `reload` after a change. */
 function useRemote<T>(load: () => Promise<T>, enabled: boolean) {
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -248,7 +248,7 @@ function useRemote<T>(load: () => Promise<T>, enabled: boolean) {
   return { data, error, reload };
 }
 
-/** The uploaded CV AutoFill suggests when CareerOS prepared none for the job. */
+/** The uploaded CV AutoFill suggests when GetCareer prepared none for the job. */
 function DefaultCv({ value, onChange, connected }: { value: string | null; onChange: (v: string | null) => void; connected: boolean }) {
   const cvs = useRemote<DocumentRef[]>(() => send({ type: "autofill.cvs" }), connected);
   if (!connected) return null;
@@ -264,11 +264,11 @@ function DefaultCv({ value, onChange, connected }: { value: string | null; onCha
             {d.name}
           </option>
         ))}
-        {value && cvs.data && !cvs.data.some((d) => d.ref === value) && <option value={value}>A CV that is no longer in CareerOS</option>}
+        {value && cvs.data && !cvs.data.some((d) => d.ref === value) && <option value={value}>A CV that is no longer in GetCareer</option>}
       </select>
       {cvs.error && <p className="text-xs text-destructive">{cvs.error}</p>}
       <p className="text-xs text-muted-foreground">
-        When CareerOS prepared a CV or cover letter for the job, AutoFill suggests that one. A file is attached only when you tick it in the review, and a file already on the form is replaced only if you tick it too.
+        When GetCareer prepared a CV or cover letter for the job, AutoFill suggests that one. A file is attached only when you tick it in the review, and a file already on the form is replaced only if you tick it too.
       </p>
     </div>
   );
@@ -284,7 +284,7 @@ function SavedAnswers({ connected }: { connected: boolean }) {
       <summary className="cursor-pointer font-medium">Saved answers ({items.length})</summary>
       <div className="mt-3 grid gap-2">
         <p className="text-xs text-muted-foreground">
-          Answers you chose to remember in the review ("Remember for other applications"). They are kept in CareerOS and offered, unticked, when a form asks the same thing.
+          Answers you chose to remember in the review ("Remember for other applications"). They are kept in GetCareer and offered, unticked, when a form asks the same thing.
         </p>
         {list.error && <p className="text-xs text-destructive">{list.error}</p>}
         {!items.length && !list.error && <p className="text-xs text-muted-foreground">None yet.</p>}
@@ -340,7 +340,7 @@ function History({ connected, enabled }: { connected: boolean; enabled: boolean 
       <summary className="cursor-pointer font-medium">AutoFill history ({items.length})</summary>
       <div className="mt-3 grid gap-2">
         <p className="text-xs text-muted-foreground">
-          {enabled ? "Kept in CareerOS: " : "Off: nothing new is kept. Earlier entries: "}the site, the company and job, how many fields were filled, and the files attached. Never what you typed or what was filled in.
+          {enabled ? "Kept in GetCareer: " : "Off: nothing new is kept. Earlier entries: "}the site, the company and job, how many fields were filled, and the files attached. Never what you typed or what was filled in.
         </p>
         {list.error && <p className="text-xs text-destructive">{list.error}</p>}
         {!items.length && !list.error && <p className="text-xs text-muted-foreground">No entries.</p>}
@@ -382,7 +382,7 @@ function History({ connected, enabled }: { connected: boolean; enabled: boolean 
                 </>
               }
             >
-              <p>Your applications and documents in CareerOS stay as they are.</p>
+              <p>Your applications and documents in GetCareer stay as they are.</p>
             </Alert>
           ) : (
             <div>
@@ -412,7 +412,7 @@ function AutofillSettingsView({ value, onChange }: { value: AutofillSettings; on
   const set = (patch: Partial<AutofillSettings>) => onChange({ ...value, ...patch });
   const session = useSession();
   const connected = session.data?.connected === true;
-  // CareerOS says which parts it offers; an older server offers none of these.
+  // GetCareer says which parts it offers; an older server offers none of these.
   const features = session.data?.connected ? session.data.bootstrap?.features : undefined;
   const answersFeature = features?.autofill_answers;
   const documentsOn = features?.autofill_documents?.enabled === true;
@@ -474,10 +474,10 @@ function AutofillSettingsView({ value, onChange }: { value: AutofillSettings; on
         <fieldset className="grid gap-3" disabled={!value.enabled}>
           <legend className="pb-2 text-[0.8125rem] font-semibold">Suggested answers to open questions</legend>
           <p className="max-w-prose text-xs text-muted-foreground">
-            In the review, CareerOS can draft answers to open questions ("Why do you want to work here?") from your Career Profile and the job. Drafts are never ticked for you,
-            and CareerOS doesn't draft salary, legal or personal questions.
-            {answersFeature && !answersFeature.enabled && answersFeature.reason === "consent_required" && " To use them, allow AI processing in your CareerOS settings."}
-            {answersFeature && !answersFeature.enabled && answersFeature.reason === "ai_unavailable" && " They aren't available on this CareerOS server."}
+            In the review, GetCareer can draft answers to open questions ("Why do you want to work here?") from your Career Profile and the job. Drafts are never ticked for you,
+            and GetCareer doesn't draft salary, legal or personal questions.
+            {answersFeature && !answersFeature.enabled && answersFeature.reason === "consent_required" && " To use them, allow AI processing in your GetCareer settings."}
+            {answersFeature && !answersFeature.enabled && answersFeature.reason === "ai_unavailable" && " They aren't available on this GetCareer server."}
           </p>
           <div className="grid gap-3 sm:grid-cols-3">
             <Select id="answers-language" label="Language" value={value.answers.language} options={LANGUAGES} onChange={(language) => set({ answers: { ...value.answers, language } })} />
@@ -494,14 +494,14 @@ function AutofillSettingsView({ value, onChange }: { value: AutofillSettings; on
             id="autofill-history"
             checked={value.history}
             onChange={(history) => set({ history })}
-            title="Keep an AutoFill history in CareerOS"
+            title="Keep an AutoFill history in GetCareer"
             hint="Which forms you filled and when, so you can find them again. No form values are kept."
           />
           <History connected={connected} enabled={value.history} />
         </fieldset>
       )}
       <p className="max-w-prose text-xs text-muted-foreground">
-        The values come from your Career Profile in CareerOS and are fetched when you open AutoFill; the extension doesn't store them. Files are downloaded from CareerOS only when you fill a form with them.{" "}
+        The values come from your Career Profile in GetCareer and are fetched when you open AutoFill; the extension doesn't store them. Files are downloaded from GetCareer only when you fill a form with them.{" "}
         <Button variant="link" className="text-xs" onClick={() => send({ type: "app.open", path: "/profile" }).catch(() => undefined)}>
           Edit your Career Profile <ExternalLink className="size-3" aria-hidden />
           <span className="sr-only">(opens a new tab)</span>
@@ -640,7 +640,7 @@ function Options() {
         <Section
           id="privacy"
           title="Privacy"
-          description="The extension sends CareerOS only the posting you choose to save or check: its address, its structured job data and the posting text. AutoFill fetches your Career Profile when you open it on a form and writes into the page only the values you reviewed. It never sends what is typed into a form to CareerOS: only the questions you ask it to draft answers to, the answers you choose to remember, and, if the AutoFill history is on, the site, job and field counts. Usage counts contain no form values and follow your CareerOS analytics setting. It never reads LinkedIn, Indeed, XING, StepStone, Glassdoor or Monster pages, and never applies or sends messages for you."
+          description="The extension sends GetCareer only the posting you choose to save or check: its address, its structured job data and the posting text. AutoFill fetches your Career Profile when you open it on a form and writes into the page only the values you reviewed. It never sends what is typed into a form to GetCareer: only the questions you ask it to draft answers to, the answers you choose to remember, and, if the AutoFill history is on, the site, job and field counts. Usage counts contain no form values and follow your GetCareer analytics setting. It never reads LinkedIn, Indeed, XING, StepStone, Glassdoor or Monster pages, and never applies or sends messages for you."
         >
           <Diagnostics enabled={settings.diagnostics} onToggle={(v) => update({ diagnostics: v })} />
           <ClearData />

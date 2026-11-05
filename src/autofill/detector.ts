@@ -31,7 +31,7 @@ export function createRegistry(): Registry {
 export type DetectOptions = {
   /** Use layout (client rects) to skip invisible controls. Off in jsdom, which has no layout. */
   layout?: boolean;
-  /** What CareerOS wrote into a control earlier, to tell "still ours" from "edited". */
+  /** What GetCareer wrote into a control earlier, to tell "still ours" from "edited". */
   filledState?: (id: string, els: Element[]) => "no" | "yes" | "edited";
 };
 
@@ -371,7 +371,7 @@ export function detectFields(doc: Document, registry: Registry, opts: DetectOpti
       multiple: kind === "select" && (el as HTMLSelectElement).multiple,
       maxLength: (kind === "text" || kind === "textarea" || kind === "email" || kind === "tel" || kind === "url") && input.maxLength > 0 ? input.maxLength : null,
       hasValue: hasValue(el, kindNow, els),
-      filledByCareerOS: opts.filledState?.(id, els) ?? "no",
+      filledByGetCareer: opts.filledState?.(id, els) ?? "no",
       ...(kind === "date" ? { inputType: input.type.toLowerCase() } : {}),
       ...(kind === "file" ? { accept: clean(input.accept, 200) ?? "" } : {}),
     });

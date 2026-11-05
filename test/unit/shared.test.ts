@@ -90,7 +90,7 @@ describe("policy", () => {
 });
 
 describe("config", () => {
-  it("builds CareerOS links only for app paths", () => {
+  it("builds GetCareer links only for app paths", () => {
     expect(appUrl("/applications/1")).toBe("http://localhost:3000/applications/1");
     expect(() => appUrl("//evil.example")).toThrow();
     expect(() => appUrl("https://evil.example")).toThrow();

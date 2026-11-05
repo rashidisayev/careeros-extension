@@ -2,7 +2,7 @@
  * Which pages the extension may read.
  *
  * Job platforms whose terms forbid automated access are never read automatically, the same
- * rule CareerOS applies to links (apps/api/app/job_imports/urls.py, RESTRICTED). On them the
+ * rule GetCareer applies to links (apps/api/app/job_imports/urls.py, RESTRICTED). On them the
  * extension only recognises the posting from its address and offers to save text the user
  * selects. The API enforces this too (a page capture from these hosts is refused), and its
  * lookup reports `restricted` for every link, so an outdated extension can't drift from it.
@@ -21,7 +21,7 @@ const RESTRICTED: (RestrictedPlatform & { host: RegExp })[] = [
 export const RESTRICTED_KEYS = RESTRICTED.map((p) => p.key);
 
 // Job-posting addresses on those platforms. Only for these is the address looked up in
-// CareerOS (to show the status of a job you track); feeds, profiles and searches are not.
+// GetCareer (to show the status of a job you track); feeds, profiles and searches are not.
 const RESTRICTED_JOB_PATH: Record<string, RegExp> = {
   linkedin: /^\/(comm\/)?jobs\/view\/(\d+|[^/]*-\d{6,})/,
   indeed: /^\/(viewjob|rc\/clk|pagead\/clk|m\/viewjob)/,
@@ -61,7 +61,7 @@ export function restrictedPlatformFor(url: string): RestrictedPlatform | null {
   return hit ? { key: hit.key, name: hit.name } : null;
 }
 
-// Pages extensions can't or mustn't script: browser and store pages, and CareerOS itself.
+// Pages extensions can't or mustn't script: browser and store pages, and GetCareer itself.
 const BLOCKED_HOSTS = /^(chromewebstore\.google\.com|chrome\.google\.com|microsoftedge\.microsoft\.com)$/;
 
 export type PageKind = "web" | "careeros" | "unsupported";

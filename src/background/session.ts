@@ -1,5 +1,5 @@
 /**
- * The connected account and what CareerOS allows for it. `bootstrap` comes from the API
+ * The connected account and what GetCareer allows for it. `bootstrap` comes from the API
  * (GET /extension/bootstrap) and is the only source of feature access: the extension never
  * decides plans or limits itself. Cached for a few minutes in chrome.storage.session.
  */

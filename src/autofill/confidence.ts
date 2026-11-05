@@ -1,5 +1,5 @@
 /**
- * Confidence engine: from what a field is (classification) and what CareerOS could put in it
+ * Confidence engine: from what a field is (classification) and what GetCareer could put in it
  * (proposal), decide what happens. The rules, in order:
  *
  *  1. Unrecognised fields, documents, sensitive, legal and preference questions: the user
@@ -45,8 +45,8 @@ export function decide(
   if (isFillableCategory(spec.category) && !settings.categories[spec.category]) {
     return { action: "excluded", confidence: classConf, reasons: ["excluded_category"] };
   }
-  if (field.filledByCareerOS === "edited") return { action: "keep", confidence: classConf, reasons: ["user_edited"] };
-  if (field.filledByCareerOS === "yes") return { action: "keep", confidence: classConf, reasons: ["already_filled"] };
+  if (field.filledByGetCareer === "edited") return { action: "keep", confidence: classConf, reasons: ["user_edited"] };
+  if (field.filledByGetCareer === "yes") return { action: "keep", confidence: classConf, reasons: ["already_filled"] };
 
   // The end date of the role the user still has: nothing to enter.
   if (proposal && !proposal.ok && proposal.reason === "current_role") return { action: "skip", confidence: classConf, reasons: ["current_role"] };

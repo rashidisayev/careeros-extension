@@ -3,14 +3,14 @@
  * what to fill, and writes only the values the user reviewed.
  *
  * - Runs only on a tab the extension may script (activeTab after the user's click, or a site
- *   they allowed), never on restricted platforms or CareerOS itself.
- * - The profile is fetched from CareerOS for each scan and kept in memory only for that call:
+ *   they allowed), never on restricted platforms or GetCareer itself.
+ * - The profile is fetched from GetCareer for each scan and kept in memory only for that call:
  *   nothing of it is stored in the browser. It reaches the page only in `fill`, field by
  *   field, after the user reviewed it.
  * - Documents are listed with the scan but downloaded only when the user fills a file input
  *   they picked one for; the bytes go to that frame only and are not kept.
  * - Before writing, the tab and each frame must still show the site that was reviewed.
- * - Suggested answers, saved answers, the history and usage counts go to CareerOS only. The
+ * - Suggested answers, saved answers, the history and usage counts go to GetCareer only. The
  *   history holds the site, the job, counts and document names, never values; usage counts
  *   hold counts and the ATS vendor only.
  */
@@ -50,7 +50,7 @@ import { sessionInfo } from "./session";
 import { readState } from "./tabs";
 
 const SCRIPT = "autofill.js";
-/** Largest document passed into a page (bytes), matching CareerOS's own limit. */
+/** Largest document passed into a page (bytes), matching GetCareer's own limit. */
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 /** Fills on the same site within this time are one application (the steps of a long form). */
 const SESSION_MS = 2 * 60 * 60_000;
@@ -94,7 +94,7 @@ async function allowedTab(tabId: number): Promise<string> {
   if (restricted) {
     throw new ExtensionError(
       "platform_restricted",
-      `${restricted.name} doesn't allow other services to read or fill its pages, so CareerOS AutoFill doesn't work there.`,
+      `${restricted.name} doesn't allow other services to read or fill its pages, so GetCareer AutoFill doesn't work there.`,
     );
   }
   return url;
@@ -106,12 +106,12 @@ async function featureOn(feature: "autofill" | "autofill_documents" | "autofill_
   const s = await sessionInfo();
   if (!s.connected) throw new ExtensionError("not_connected", messageFor("not_connected"), 401);
   const f = s.bootstrap?.features[feature];
-  // CareerOS decides which features an account has; an older server without one says nothing.
+  // GetCareer decides which features an account has; an older server without one says nothing.
   if (!f?.enabled) {
     if (feature === "autofill_answers" && f?.reason === "consent_required") {
-      throw new ExtensionError("ai_consent_required", "Allow AI processing in your CareerOS settings to get suggested answers.");
+      throw new ExtensionError("ai_consent_required", "Allow AI processing in your GetCareer settings to get suggested answers.");
     }
-    throw new ExtensionError("feature_unavailable", feature === "autofill" ? "AutoFill isn't available for your CareerOS account yet." : "This part of AutoFill isn't available for your CareerOS account.");
+    throw new ExtensionError("feature_unavailable", feature === "autofill" ? "AutoFill isn't available for your GetCareer account yet." : "This part of AutoFill isn't available for your GetCareer account.");
   }
 }
 
@@ -120,7 +120,7 @@ async function hasFeature(feature: "autofill_documents" | "autofill_history"): P
   return s.connected && s.bootstrap?.features[feature]?.enabled === true;
 }
 
-/** A frame may be read only if it is an ordinary site (not a restricted platform, not CareerOS). */
+/** A frame may be read only if it is an ordinary site (not a restricted platform, not GetCareer). */
 function frameAllowed(frameUrl: string): boolean {
   return pageKind(frameUrl, CAREEROS_ORIGIN) === "web" && !restrictedPlatformFor(frameUrl);
 }
@@ -379,7 +379,7 @@ export async function answersTab(
   await featureOn("autofill_answers");
   const settings = await loadSettings();
   const job = jobOf(await readState(tabId).catch(() => null));
-  // The question texts and the posting go to CareerOS, never anything typed into the form.
+  // The question texts and the posting go to GetCareer, never anything typed into the form.
   const out = await api.autofillAnswers({
     url,
     application_id: job.applicationId,

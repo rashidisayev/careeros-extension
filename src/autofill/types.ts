@@ -1,5 +1,5 @@
 /**
- * CareerOS AutoFill: the shapes passed between its parts.
+ * GetCareer AutoFill: the shapes passed between its parts.
  *
  *   page (autofill.js)                 service worker                    side panel
  *   detector: DOM → FieldDescriptor ─▶ classifier → mapper → confidence ─▶ review (user edits,
@@ -10,7 +10,7 @@
  * the values the user reviewed.
  */
 
-/** What CareerOS knows a form field to ask for. */
+/** What GetCareer knows a form field to ask for. */
 export type FieldKey =
   // Personal
   | "first_name"
@@ -135,8 +135,8 @@ export type FieldDescriptor = {
   maxLength: number | null;
   /** Whether the control holds something already. The value itself is never read out. */
   hasValue: boolean;
-  /** "yes": still holds what CareerOS wrote; "edited": the user changed it since. */
-  filledByCareerOS: "no" | "yes" | "edited";
+  /** "yes": still holds what GetCareer wrote; "edited": the user changed it since. */
+  filledByGetCareer: "no" | "yes" | "edited";
   /** The input's own type for date-like controls ("date", "month"). */
   inputType?: string;
   /** What a file input accepts (".pdf,.docx"). */
@@ -224,9 +224,9 @@ export type AutofillProfile = {
   saved_answers?: SavedAnswer[];
 };
 
-/** A CV or cover letter CareerOS can attach (POST /extension/autofill/documents). */
+/** A CV or cover letter GetCareer can attach (POST /extension/autofill/documents). */
 export type DocumentRef = {
-  /** "resume:<id>" (an uploaded CV) or "generated:<id>" (prepared in CareerOS). */
+  /** "resume:<id>" (an uploaded CV) or "generated:<id>" (prepared in GetCareer). */
   ref: string;
   kind: "cv" | "cover_letter";
   name: string;
@@ -242,7 +242,7 @@ export type DocumentsOut = { application: ApplicationRef | null; documents: Docu
 /**
  * What to write into one control. "options": the options to select in a multi-select or a
  * group of checkboxes. "choose": the entries to pick from a widget's list, by their text.
- * "file": a document from CareerOS (fetched by the service worker only when filling).
+ * "file": a document from GetCareer (fetched by the service worker only when filling).
  */
 export type FillValue =
   | { kind: "text"; text: string }
@@ -308,7 +308,7 @@ export type PlanItem = {
   confidence: Confidence;
   action: PlanAction;
   reasons: PlanReason[];
-  /** The proposed value (null when CareerOS proposes nothing). */
+  /** The proposed value (null when GetCareer proposes nothing). */
   value: FillValue | null;
   /** The proposed value in words, for the review list. */
   display: string | null;
@@ -320,7 +320,7 @@ export type PlanItem = {
   question: string;
   /** The user may type or choose an answer for it in the review. */
   answerable: boolean;
-  /** CareerOS can draft an answer to it (an open question; AI, with consent). */
+  /** GetCareer can draft an answer to it (an open question; AI, with consent). */
   draftable: boolean;
   /** For file inputs: what the field asks for and accepts. */
   document: { kind: "cv" | "cover_letter"; accept: string | null } | null;
@@ -341,7 +341,7 @@ export type AutofillPlan = {
   ats: { id: AtsId; name: string } | null;
   /** The page's language ("de", "en"…), for suggested answers. */
   lang: string | null;
-  /** Documents CareerOS can attach, and the tracked application they were prepared for. */
+  /** Documents GetCareer can attach, and the tracked application they were prepared for. */
   documents: DocumentRef[];
   application: ApplicationRef | null;
   /** Roles and schools in the profile beyond the entries the form shows now. */
@@ -382,15 +382,15 @@ export type AutofillSettings = {
   enabled: boolean;
   categories: Record<FillableCategory, boolean>;
   excluded: FieldKey[];
-  /** Keep an AutoFill history in CareerOS (site, job, field counts, documents; no values). */
+  /** Keep an AutoFill history in GetCareer (site, job, field counts, documents; no values). */
   history: boolean;
   /** Suggested answers: language ("auto": the page's), length and tone. */
   answers: { language: "auto" | "en" | "de"; length: AnswerLength; tone: AnswerTone };
-  /** The uploaded CV to suggest when CareerOS prepared none for the job ("resume:<id>"). */
+  /** The uploaded CV to suggest when GetCareer prepared none for the job ("resume:<id>"). */
   defaultCv: string | null;
 };
 
-// ---- Suggested answers, history (CareerOS API) --------------------------------------------
+// ---- Suggested answers, history (GetCareer API) --------------------------------------------
 
 export type AnswerQuestion = { id: string; text: string; max_length: number | null };
 export type AnswerOut = {
@@ -399,7 +399,7 @@ export type AnswerOut = {
   status: "drafted" | "needs_input" | "declined";
   answer: string | null;
   missing: string | null;
-  /** Claims CareerOS couldn't find in the profile (numbers, skills), or a length problem. */
+  /** Claims GetCareer couldn't find in the profile (numbers, skills), or a length problem. */
   issues: string[];
 };
 export type AnswersOut = { context: "application" | "page" | "title_only"; answers: AnswerOut[] };

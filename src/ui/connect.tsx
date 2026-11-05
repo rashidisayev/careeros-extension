@@ -27,12 +27,12 @@ export function ConnectView({ reason, onConnected, compact }: { reason?: "expire
     <div className="grid gap-4">
       <div className="grid gap-1.5">
         <h1 className="text-base font-semibold">
-          {reason === "expired" ? "Connect again to continue" : "Connect to your CareerOS account"}
+          {reason === "expired" ? "Connect again to continue" : "Connect to your GetCareer account"}
         </h1>
         <p className="text-muted-foreground">
           {reason === "expired"
-            ? "The connection to CareerOS ended, for example because it was disconnected in Settings."
-            : "You approve the connection on the CareerOS website, signed in as usual. Your password never passes through the extension."}
+            ? "The connection to GetCareer ended, for example because it was disconnected in Settings."
+            : "You approve the connection on the GetCareer website, signed in as usual. Your password never passes through the extension."}
         </p>
       </div>
       {!compact && (
@@ -70,10 +70,10 @@ export function ConnectView({ reason, onConnected, compact }: { reason?: "expire
       )}
       <div className="grid gap-2">
         <Button busy={busy} onClick={connect}>
-          Connect to CareerOS
+          Connect to GetCareer
         </Button>
         <Button variant="ghost" onClick={() => send({ type: "app.open", path: "/register" }).catch(() => undefined)}>
-          Create a CareerOS account <ExternalLink aria-hidden />
+          Create a GetCareer account <ExternalLink aria-hidden />
           <span className="sr-only">(opens a new tab)</span>
         </Button>
       </div>

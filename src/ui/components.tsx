@@ -1,5 +1,5 @@
 /**
- * The few controls the extension needs, built from CareerOS tokens to match the web app's
+ * The few controls the extension needs, built from GetCareer tokens to match the web app's
  * components (apps/web/components/ui): 36px controls, radius 8, petrol primary, one focus ring.
  */
 import { AlertTriangle, Check, CircleAlert, Info, Loader2, PencilLine, Sparkles } from "lucide-react";
@@ -146,7 +146,7 @@ export function SourceTag({ source, edited, empty }: { source?: Provenance | nul
   const label = stated ? "From the posting" : source.confidence === "low" ? "Please check" : "Interpreted";
   const explain = stated
     ? `Stated in the posting${source.source === "structured_data" ? " (its structured data)" : ""}.`
-    : `${source.source === "ai" ? "AI" : "CareerOS"} interpreted this from the posting; please check it.`;
+    : `${source.source === "ai" ? "AI" : "GetCareer"} interpreted this from the posting; please check it.`;
   return (
     <span
       title={explain}
@@ -213,8 +213,8 @@ export function Logo({ className }: { className?: string }) {
         <circle cx="25.531" cy="6.469" r="3.25" className="fill-brand-node" />
       </svg>
       <span className="text-[0.9375rem] tracking-[-0.02em]">
+        <span className="font-medium opacity-80">Get</span>
         <span className="font-semibold">Career</span>
-        <span className="font-medium opacity-80">OS</span>
       </span>
     </span>
   );

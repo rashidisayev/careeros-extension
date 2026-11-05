@@ -1,19 +1,19 @@
-# CareerOS Companion — Architecture
+# GetCareer Companion — Architecture
 
-CareerOS Companion is the CareerOS browser extension for Chrome and Edge (Manifest V3). It
-saves the job posting on the current page to CareerOS and shows whether you already track
+GetCareer Companion is the GetCareer browser extension for Chrome and Edge (Manifest V3). It
+saves the job posting on the current page to GetCareer and shows whether you already track
 it. It holds no data of its own: every job, application, match and duplicate comes from the
-CareerOS API and goes through the same code the website uses.
+GetCareer API and goes through the same code the website uses.
 
 Code: this project, `~/Desktop/careeros-extension` (the extension). The server side lives in the
-CareerOS repo, `~/Desktop/careeros`: `apps/api/app/extension` and `apps/api/app/auth/extension*.py`
+GetCareer repo, `~/Desktop/careeros`: `apps/api/app/extension` and `apps/api/app/auth/extension*.py`
 (API additions), `apps/web/app/(auth)/connect/extension` and `apps/web/features/extension`,
 `apps/web/features/settings/extension-card.tsx` (website additions).
 
 ## Overview
 
 ```
- Job page (untrusted)            Extension                              CareerOS
+ Job page (untrusted)            Extension                              GetCareer
  ───────────────────   ┌──────────────────────────────────┐   ┌───────────────────────────┐
                        │ popup / side panel / options      │   │ Next.js (apps/web)        │
                        │   React 19, no network access     │   │  /connect/extension       │
@@ -53,16 +53,16 @@ Three rules shape the design:
 | Popup | `src/popup/main.tsx` | 360 px summary of the current tab: connect, status of a job you track, save, open the side panel |
 | Side panel | `src/sidepanel/main.tsx` | The full flow: preview, progress, review and edit, duplicates, save, the saved state, pasted text, per-site access |
 | Options | `src/options/main.tsx` | Account and disconnect, theme, default stage, follow tabs, AutoFill settings (categories, fields, default CV, answer language, length and tone, saved answers, history), site access list, privacy, clear local data, diagnostics |
-| AutoFill | `src/autofill/*`, `src/content/autofill.ts` → `autofill.js` (IIFE), `src/background/autofill.ts`, `src/ui/autofill-view.tsx` | Fills application forms from the Career Profile after review: personal details, work history and education, list widgets, CVs and cover letters from CareerOS, saved and suggested answers, multi-step forms, on any site and with adapters for 11 ATS vendors. The detector, executor and form watcher run in the page; the classification, mapping and plan run in the service worker. See [AUTOFILL.md](AUTOFILL.md) |
+| AutoFill | `src/autofill/*`, `src/content/autofill.ts` → `autofill.js` (IIFE), `src/background/autofill.ts`, `src/ui/autofill-view.tsx` | Fills application forms from the Career Profile after review: personal details, work history and education, list widgets, CVs and cover letters from GetCareer, saved and suggested answers, multi-step forms, on any site and with adapters for 11 ATS vendors. The detector, executor and form watcher run in the page; the classification, mapping and plan run in the service worker. See [AUTOFILL.md](AUTOFILL.md) |
 | Shared | `src/shared/*` | Message contract (`messages.ts`), API types, restricted-platform policy, settings with migrations, redacting logger, build config |
-| UI kit | `src/ui/*` | Components, hooks and views shared by popup and side panel, styled with the CareerOS tokens |
+| UI kit | `src/ui/*` | Components, hooks and views shared by popup and side panel, styled with the GetCareer tokens |
 
 ## Saving a job, step by step
 
 1. The user opens the popup (toolbar button or `Alt+Shift+J`) or the side panel. The UI asks
    the service worker for `tab.state`.
 2. The service worker classifies the tab (`src/background/tabs.ts`):
-   - `careeros`: a CareerOS page. `unsupported`: not http(s), or a browser page.
+   - `careeros`: a GetCareer page. `unsupported`: not http(s), or a browser page.
    - `restricted`: LinkedIn, Indeed, Glassdoor, XING, StepStone or Monster. Not scripted.
    - `no_access`: no `activeTab` grant and no site permission.
    - Otherwise it injects the extractor and scores the result: `job`, `maybe_job` or `not_job`.
@@ -81,7 +81,7 @@ Three rules shape the design:
    possible duplicate returns 409 `possible_duplicate`. The panel then offers only *Open the
    existing application* or *Save as a separate application*, which sends
    `allow_duplicate: true`. The existing application is never changed.
-7. The saved state links to the application in CareerOS. The tab's lookup is refreshed so
+7. The saved state links to the application in GetCareer. The tab's lookup is refreshed so
    the popup shows the new status at once.
 
 Selected text and pasted text use the same import (`{text}`). A link alone uses `{url}`, and
@@ -159,8 +159,8 @@ Vite 8 builds three bundles (`scripts/build.mjs`):
   selected by `EXT_PAGE_SCRIPT`). They are injected as files, never as strings, so no code is
   evaluated from page data.
 
-The manifest is generated per build (`scripts/manifest.mjs`), which fixes the CareerOS
-origin. Production defaults to `https://career.isayev.app`; development uses
+The manifest is generated per build (`scripts/manifest.mjs`), which fixes the GetCareer
+origin. Production defaults to `https://getcareer.io`; development uses
 `http://localhost:3000`. The same origin is used for `host_permissions`, the CSP
 `connect-src` and the API base URL, so tokens can only ever be sent to it. Development builds
 carry a public `key` for a stable extension id. Store builds don't.
@@ -176,7 +176,7 @@ carry a public `key` for a stable extension id. Store builds don't.
     from the popup and side panel, not by a content script on every page.
 41. AutoFill Phases 2 and 3: ATS adapters only add evidence to the generic engine (they
     can't fill what the rules leave to the user). List widgets are filled by clicking a
-    matching entry, never by typing into them. Files come from CareerOS only on Fill and only
+    matching entry, never by typing into them. Files come from GetCareer only on Fill and only
     for a ticked file field. Suggested answers are drafted on the server from the profile and
     the job only, never for salary, legal or personal questions, need AI consent, and are
     never ticked for the user. Answers are saved only when the user ticks *Remember*. The

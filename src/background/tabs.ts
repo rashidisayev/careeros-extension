@@ -5,7 +5,7 @@
  *
  * A page is read only when the extension may script it: right after the user clicked the
  * toolbar icon, pressed the shortcut or used the context menu (activeTab), or on a site they
- * allowed. Nothing runs on other pages, and nothing is sent to CareerOS unless the page is a
+ * allowed. Nothing runs on other pages, and nothing is sent to GetCareer unless the page is a
  * job posting.
  */
 import type { LookupOut } from "../shared/api-types";

@@ -209,7 +209,7 @@ export function clearHighlights(state: ExecutorState, only?: Element[]): void {
   }
 }
 
-/** "yes": still what CareerOS wrote; "edited": changed since; "no": never filled. */
+/** "yes": still what GetCareer wrote; "edited": changed since; "no": never filled. */
 export function filledState(state: ExecutorState, id: string, els: Element[]): "no" | "yes" | "edited" {
   const w = state.written.get(id);
   if (!w) return "no";

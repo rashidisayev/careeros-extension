@@ -1,6 +1,6 @@
 /**
  * Zips a production build for the Chrome Web Store or Microsoft Edge Add-ons:
- *   release/careeros-companion-<version>-<target>.zip
+ *   release/getcareer-companion-<version>-<target>.zip
  * Refuses development builds (they carry the dev key and localhost access).
  *
  *   node scripts/package.mjs [--target chrome|edge]
@@ -24,7 +24,7 @@ if ((manifest.host_permissions ?? []).some((h) => !h.startsWith("https://"))) pr
 if (problems.length) throw new Error(`Not packaging ${dist}: ${problems.join(", ")}. Run the production build first.`);
 
 mkdirSync(`${root}/release`, { recursive: true });
-const out = `${root}/release/careeros-companion-${manifest.version}-${target}.zip`;
+const out = `${root}/release/getcareer-companion-${manifest.version}-${target}.zip`;
 if (existsSync(out)) rmSync(out);
 // Source maps stay out of store packages.
 execFileSync("zip", ["-r", "-X", "-q", out, ".", "-x", "*.map", "-x", ".*"], { cwd: dist, stdio: "inherit" });

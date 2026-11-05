@@ -1,6 +1,6 @@
 /**
- * Build-time configuration. The CareerOS server is fixed per build (production:
- * https://career.isayev.app, development: http://localhost:3000) so tokens can only ever be
+ * Build-time configuration. The GetCareer server is fixed per build (production:
+ * https://getcareer.io, development: http://localhost:3000) so tokens can only ever be
  * sent to the origin the manifest grants access to. See docs/DEVELOPMENT_SETUP.md.
  */
 export const CAREEROS_URL = __CAREEROS_URL__.replace(/\/+$/, "");
@@ -11,10 +11,10 @@ export const BUILD_MODE = __BUILD_MODE__;
 export const BUILD_TARGET = __BUILD_TARGET__;
 export const IS_PRODUCTION = BUILD_MODE === "production";
 
-/** Path inside the CareerOS web app; anything else is refused (no open redirects). */
+/** Path inside the GetCareer web app; anything else is refused (no open redirects). */
 export function appUrl(path: string): string {
   if (!/^\/[A-Za-z0-9/_\-?=&.%]*$/.test(path) || path.startsWith("//")) {
-    throw new Error("Not a CareerOS path");
+    throw new Error("Not a GetCareer path");
   }
   return `${CAREEROS_URL}${path}`;
 }

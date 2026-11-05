@@ -1,5 +1,5 @@
 /**
- * The extension manifest, generated per build so the CareerOS origin, the version and the
+ * The extension manifest, generated per build so the GetCareer origin, the version and the
  * development key come from one place. Permissions are explained in
  * docs/SECURITY.md; keep that list in sync when changing them.
  */
@@ -13,14 +13,14 @@ export function manifest({ version, careerosUrl, mode, target, e2e = false, side
   const dev = mode !== "production";
   const m = {
     manifest_version: 3,
-    name: dev ? "CareerOS Companion (dev)" : "CareerOS Companion",
-    short_name: "CareerOS",
+    name: dev ? "GetCareer Companion (dev)" : "GetCareer Companion",
+    short_name: "GetCareer",
     version,
-    description: "Save job postings to CareerOS, see what you already track, and review every detail before it's saved.",
+    description: "Save job postings to GetCareer, see what you already track, and review every detail before it's saved.",
     minimum_chrome_version: "116",
     icons: { 16: "icons/16.png", 32: "icons/32.png", 48: "icons/48.png", 128: "icons/128.png" },
     action: {
-      default_title: "CareerOS Companion",
+      default_title: "GetCareer Companion",
       default_popup: "popup.html",
       default_icon: { 16: "icons/16.png", 32: "icons/32.png" },
     },
@@ -33,7 +33,7 @@ export function manifest({ version, careerosUrl, mode, target, e2e = false, side
     commands: {
       _execute_action: {
         suggested_key: { default: "Alt+Shift+J" },
-        description: "Open CareerOS Companion on this page",
+        description: "Open GetCareer Companion on this page",
       },
     },
     content_security_policy: {

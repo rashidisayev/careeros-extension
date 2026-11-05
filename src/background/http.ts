@@ -1,5 +1,5 @@
 /**
- * HTTP to the CareerOS API: JSON in and out, timeouts, the API's error envelope, request ids.
+ * HTTP to the GetCareer API: JSON in and out, timeouts, the API's error envelope, request ids.
  * Cookies are never sent (credentials: "omit"): the extension authenticates with its own
  * bearer token only, so it can't act through the website's session.
  */

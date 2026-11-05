@@ -18,7 +18,7 @@ function d(signals: FieldSignals, kind: ControlKind = "text", options: string[] 
     multiple: false,
     maxLength: null,
     hasValue: false,
-    filledByCareerOS: "no",
+    filledByGetCareer: "no",
   };
 }
 

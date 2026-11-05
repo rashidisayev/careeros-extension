@@ -205,7 +205,7 @@ describe("planner: job preferences, saved answers, skills", () => {
     expect(one(p.items, "Which languages do you speak?")).toMatchObject({ action: "confirm", value: { kind: "options", indexes: [1, 0] } });
   });
 
-  it("marks open questions as ones CareerOS can draft, and other questions as ones to answer", () => {
+  it("marks open questions as ones GetCareer can draft, and other questions as ones to answer", () => {
     const p = plan("history-generic.html");
     expect(one(p.items, "Why do you want to join Brightwave?")).toMatchObject({ action: "ask", answerable: true, draftable: true, question: "Why do you want to join Brightwave?" });
     expect(one(p.items, "Notice period").draftable).toBe(false);
@@ -230,7 +230,7 @@ describe("planner: CVs and cover letters", () => {
     expect((one(p.items, "CV").value as { ref: string }).ref).toBe(second.ref);
   });
 
-  it("leaves file fields to the user when CareerOS has no document that fits", () => {
+  it("leaves file fields to the user when GetCareer has no document that fits", () => {
     const p = plan("history-generic.html", { extras: { documents: { application: null, documents: [OLD_CV] } } });
     expect(one(p.items, "CV")).toMatchObject({ action: "ask", reasons: ["document"], value: null });
   });

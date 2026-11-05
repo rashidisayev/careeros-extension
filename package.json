@@ -1,8 +1,8 @@
 {
-  "name": "careeros-companion",
-  "version": "0.2.0",
+  "name": "getcareer-companion",
+  "version": "0.3.0",
   "private": true,
-  "description": "CareerOS Companion: the CareerOS browser extension (Chrome, Edge; Manifest V3)",
+  "description": "GetCareer Companion: the GetCareer browser extension (Chrome, Edge; Manifest V3)",
   "type": "module",
   "scripts": {
     "dev": "node scripts/build.mjs --mode development --watch",
@@ -15,7 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "node scripts/build.mjs --mode development --e2e && playwright test",
-    "test:live": "CAREEROS_LIVE=1 vitest run test/live",
+    "test:live": "GETCAREER_LIVE=1 vitest run test/live",
     "package:edge": "node scripts/build.mjs --mode production --target edge && node scripts/package.mjs --target edge",
     "build:sideload": "node scripts/build.mjs --mode production --sideload"
   },

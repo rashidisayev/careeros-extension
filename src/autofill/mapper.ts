@@ -1,5 +1,5 @@
 /**
- * Profile data mapper: the value CareerOS would put into one classified control, and how sure
+ * Profile data mapper: the value GetCareer would put into one classified control, and how sure
  * it is. Only values from the Career Profile are used; when the profile doesn't hold
  * something, or no option on the page fits it, there is no proposal (never a guess).
  */

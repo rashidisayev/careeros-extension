@@ -1,9 +1,9 @@
-# CareerOS AutoFill
+# GetCareer AutoFill
 
 Status as of 2026-11-05: **Phases 1, 2 and 3 implemented and verified** in the extension
-and the CareerOS API (tests below). Phase 1 runs on career.isayev.app. Phases 2 and 3 are
-not deployed and not committed. AutoFill fills job application forms from the user's Career
-Profile in CareerOS. The user reviews every value first and submits the application
+and the GetCareer API (tests below). Phases 1 to 3 were deployed on 2026-11-05 to the production
+server (then still career.isayev.app; extension 0.2.0) and are not committed yet. AutoFill fills job application forms from the user's Career
+Profile in GetCareer. The user reviews every value first and submits the application
 themselves.
 
 Rules that hold in every phase:
@@ -34,8 +34,8 @@ Rules that hold in every phase:
 | Phase | Scope | Status |
 |---|---|---|
 | **1** | Career Profile mapping, generic form detection, English and German labels, personal and professional fields and links, confidence rules, review, field and category exclusions, undo, highlights, settings | **Done**, deployed |
-| **2** | Employment and education history (repeating entries, dates in the form's format), list widgets and multi-selects, ATS adapters for 11 vendors, multi-step forms (the page is watched for new fields), CV and cover letter attachment from CareerOS, answers typed in the review | **Done**, not deployed |
-| **3** | Suggested answers to open questions (AI, with consent, drafts never ticked), saved answers (only when the user ticks *Remember*), job preferences and salary target as suggestions, answer language, length and tone, AutoFill history, usage counts | **Done**, not deployed |
+| **2** | Employment and education history (repeating entries, dates in the form's format), list widgets and multi-selects, ATS adapters for 11 vendors, multi-step forms (the page is watched for new fields), CV and cover letter attachment from GetCareer, answers typed in the review | **Done**, deployed |
+| **3** | Suggested answers to open questions (AI, with consent, drafts never ticked), saved answers (only when the user ticks *Remember*), job preferences and salary target as suggestions, answer language, length and tone, AutoFill history, usage counts | **Done**, deployed |
 
 ### Product decision: suggested answers (Phase 3)
 
@@ -54,8 +54,8 @@ The brief left this open. It was decided as follows, and the code enforces each 
 3. **Consent required.** Drafting needs AI enabled on the server and the user's AI consent
    (`features.autofill_answers`). Without consent the review explains how to allow it.
 4. **Drafts are never ticked.** A draft lands in the answer box, unticked, marked "Drafted
-   by CareerOS from your profile". The user reads it, edits it and ticks it.
-5. **Saved only on request.** An answer is kept in CareerOS only when the user ticks
+   by GetCareer from your profile". The user reads it, edits it and ticks it.
+5. **Saved only on request.** An answer is kept in GetCareer only when the user ticks
    *Remember for other applications*, and only after it was filled. Options lists the saved
    answers and lets the user delete them.
 
@@ -77,13 +77,13 @@ For Phases 2 and 3 (`app/extension/autofill.py`, migration
 | Added | What it does |
 |---|---|
 | `GET /extension/autofill-profile` extended | Adds `experiences` (newest first: company, title, location, start and end month, current), `education` (institution, degree, field, start and graduation year), `skills`, `languages`, `certifications`, `preferences` (relocation, remote, employment types, locations, salary minimum and target, currency) and `saved_answers`. Older extensions ignore the new keys |
-| `POST /extension/autofill/documents` | The documents CareerOS can attach for a page: ready tailored CVs and cover letters for the tracked application (the newest of each kind is recommended, "Prepared for …"), then the uploaded CVs (PDF, DOCX). Also returns the tracked application for the URL (same link or same posting) |
+| `POST /extension/autofill/documents` | The documents GetCareer can attach for a page: ready tailored CVs and cover letters for the tracked application (the newest of each kind is recommended, "Prepared for …"), then the uploaded CVs (PDF, DOCX). Also returns the tracked application for the URL (same link or same posting) |
 | `GET /extension/autofill/documents/{resume\|generated}/{id}/file?format=pdf\|docx` | Streams one owned document, at most `extension_document_max_bytes` (10 MB). Generated documents are rendered on request. `Cache-Control: private, no-store`; audited as `resume.downloaded` or `document.exported` with `via=extension_autofill` |
 | `POST /extension/autofill/answers` | Drafts answers, 1–10 questions per call (see the decision above). Rate limit `extension_answers_per_hour` (30). Errors: `ai_unavailable`, `ai_consent_required`, `profile_empty`, `ai_failed`. Usage is recorded as `autofill_answers` |
 | `GET`, `POST /extension/autofill/saved-answers`, `DELETE /…/{id}` | Saved answers (`autofill_saved_answers`): by field key (for the reusable keys) or by question; at most 200 per user; a second save of the same key or question updates it |
 | `GET`, `POST /extension/autofill/history`, `PUT`, `DELETE /…/{id}`, `DELETE /extension/autofill/history` | History entries (`autofill_sessions`): site, ATS, company, job title, application, counts of filled, confirmed and asked fields, and the names of attached files. No form values. At most 500 per user (oldest dropped) |
 | `POST /extension/autofill/events` | Usage counts: `form_detected`, `filled`, `no_form`, `document_attached`, with the ATS and numbers only. They follow the user's analytics opt-out |
-| Feature flags | `autofill_documents`, `autofill_answers` (off without AI or consent, with the reason), `autofill_saved_answers`, `autofill_history`. The extension shows each part only when its flag is on. Against an older CareerOS without these flags it behaves like Phase 1: no documents, drafts, *Remember* or history, and no Options sections for them |
+| Feature flags | `autofill_documents`, `autofill_answers` (off without AI or consent, with the reason), `autofill_saved_answers`, `autofill_history`. The extension shows each part only when its flag is on. Against an older GetCareer without these flags it behaves like Phase 1: no documents, drafts, *Remember* or history, and no Options sections for them |
 | Privacy | Saved answers and history are in the privacy export and are deleted with the account |
 
 Still not filled: date of birth and nationality are not stored in the profile. They are
@@ -92,11 +92,11 @@ sensitive anyway, so AutoFill offers them only from an answer the user saved.
 ## How it works for the user
 
 1. On an application form, open the extension (icon, `Alt+Shift+J`, or the side panel).
-   The **CareerOS AutoFill** card shows the counts: *19 fields detected · 11 ready to fill ·
+   The **GetCareer AutoFill** card shows the counts: *19 fields detected · 11 ready to fill ·
    1 needs your confirmation · 7 need your input*.
 2. **Fill application** opens the review in the side panel. It has five groups: *Ready to
    fill* (ticked), *Please confirm* (unticked suggestions), *Already filled in on the page*,
-   *Needs your input* (with the reason, e.g. "Sensitive or legal. CareerOS never fills this;
+   *Needs your input* (with the reason, e.g. "Sensitive or legal. GetCareer never fills this;
    answer it yourself."), and *Left alone*. Each value is editable. *Never fill X* adds a
    field to the exclusions.
 3. **Fill N fields** writes only the ticked values. Filled fields get a solid teal outline;
@@ -116,7 +116,7 @@ In the review (Phases 2 and 3):
   widget is a search box, and clicking the matching entry. The entry must have the same
   words, or be the only entry containing them. Otherwise nothing is picked. These are
   suggestions to confirm.
-- **CVs and cover letters**: a file field shows the document CareerOS suggests (prepared for
+- **CVs and cover letters**: a file field shows the document GetCareer suggests (prepared for
   this job, else the default CV from Options, else the newest), with a picker and a format
   choice that respects the field's `accept`. The file is downloaded only when the user fills,
   and a file already on the form is replaced only if the user ticks it.
@@ -137,7 +137,7 @@ list of fields that are never filled is shown there for transparency.
 ## Architecture
 
 ```
-page (isolated world)                 service worker                         CareerOS API
+page (isolated world)                 service worker                         GetCareer API
 ─────────────────────                 ──────────────                         ────────────
 autofill.js (injected on demand)      background/autofill.ts                 GET /extension/bootstrap
   detector: DOM → FieldDescriptor[] ──► scanTab: allowed? feature on?          (features.autofill*)
@@ -170,7 +170,7 @@ autofill.js (injected on demand)      background/autofill.ts                 GET
 
 Messages (validated in `src/shared/messages.ts`): `autofill.scan`, `autofill.fill` (at most
 400 items; field ids `f<digits>`; values: text ≤ 10,000 characters, an option index, a
-checkbox state, a list of option indexes, list-widget picks, or a file given by a CareerOS
+checkbox state, a list of option indexes, list-widget picks, or a file given by a GetCareer
 reference `resume:<uuid>`/`generated:<uuid>`, a format and a plain file name; optional
 `stats` with counts and the ATS id), `autofill.undo`, `autofill.done`, `autofill.answers`
 (1–10 questions, language `en` or `de`), `autofill.savedAnswers`, `autofill.saveAnswer`,
@@ -181,13 +181,13 @@ reference `resume:<uuid>`/`generated:<uuid>`, a format and a plain file name; op
 
 - **No new permissions.** It uses the same `activeTab` + `scripting` as job reading, injected
   only when the user opens the extension on that tab. There are no content scripts and no
-  host permissions beyond CareerOS.
+  host permissions beyond GetCareer.
 - **The profile is fetched per scan and held in memory only.** Nothing from the profile or
   the form is written to extension storage. The plan lives in the side panel's memory, and
   the page keeps only the before and after snapshots needed for undo, in the injected
   script's isolated world.
-- **Nothing typed into the form is sent to CareerOS.** Classification runs in the service
-  worker, on labels and attributes, not on values. CareerOS receives only: the question
+- **Nothing typed into the form is sent to GetCareer.** Classification runs in the service
+  worker, on labels and attributes, not on values. GetCareer receives only: the question
   texts the user asks it to draft, with the job; an answer the user chose to remember; and,
   with the history on, the site, job, counts and the names of attached files.
 - **Files** are downloaded by the service worker only when the user fills with them, passed
@@ -195,7 +195,7 @@ reference `resume:<uuid>`/`generated:<uuid>`, a format and a plain file name; op
   file must match the field's `accept` list (`wrong_file_type` otherwise).
 - **Usage counts** contain the event, the ATS id and numbers. They contain no names,
   emails, phone numbers, salary answers, legal status or other form values, and they follow
-  the CareerOS analytics opt-out.
+  the GetCareer analytics opt-out.
 - **The history session in the browser** (`chrome.storage.session`, cleared when the browser
   closes) holds the entry id, the origin and the counts for an open application, so later
   steps update the same entry.
@@ -213,7 +213,7 @@ reference `resume:<uuid>`/`generated:<uuid>`, a format and a plain file name; op
 |---|---|
 | Extension unit (Vitest) | **342 passed**, 14 files. AutoFill: classifier 58, plan 28, executor 12, background 33; Phase 2 and 3: `autofill-history` 41 (sections, dates, history entries, preferences, saved answers, documents, the 11 vendors, multi-step), `autofill-widgets` 15 (list widgets, multi-selects, checkbox groups, file attach, the form watcher), `autofill-background-phase2` 15 (documents only for file fields and only on Fill, history per application, answers, consent, message validation, the changed-form relay), `autofill-panel` 6 (drafts unticked, saving only after the fill, nothing offered by an older server, the next step); settings v1→v2→v3 migrations |
 | Extension live API | **8 passed** |
-| Extension browser (Playwright, Chromium, real API) | **9 passed**. The new AutoFill test runs a two-step form: two roles (dates as MM/YYYY), a list widget, a CV uploaded to CareerOS and attached to the file field in the real browser, then the second step (school, graduation year) offered after *Next*, and one history entry for both steps. Nothing is submitted |
+| Extension browser (Playwright, Chromium, real API) | **9 passed**. The new AutoFill test runs a two-step form: two roles (dates as MM/YYYY), a list widget, a CV uploaded to GetCareer and attached to the file field in the real browser, then the second step (school, graduation year) offered after *Next*, and one history entry for both steps. Nothing is submitted |
 | Backend, full suite | **505 passed, 3 skipped**; `ruff` clean. Web `tsc` clean |
 | Backend `tests/test_extension_autofill.py` | **33 passed**: profile arrays, documents and file streaming (ownership, size limit), answers (consent, grounding issues, declined sensitive questions never sent to the model, context, failure, validation, rate limit), saved answers, history (step updates, trimming, foreign application ids dropped), events and opt-out, privacy export and deletion |
 

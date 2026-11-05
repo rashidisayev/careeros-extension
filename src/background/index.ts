@@ -1,5 +1,5 @@
 /**
- * CareerOS Companion service worker. All listeners are registered synchronously at the top
+ * GetCareer Companion service worker. All listeners are registered synchronously at the top
  * level so the browser can wake the worker for them (Manifest V3).
  */
 import { log, setConsoleLogging } from "../shared/log";

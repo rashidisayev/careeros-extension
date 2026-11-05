@@ -7,8 +7,8 @@ import { defines } from "./vite.shared.ts";
  * EXT_PAGE_SCRIPT picks which: "extractor" (the page reader, default) or "autofill".
  */
 const SCRIPTS = {
-  extractor: { entry: "./src/content/extractor.ts", name: "CareerOSExtractor" },
-  autofill: { entry: "./src/content/autofill.ts", name: "CareerOSAutofill" },
+  extractor: { entry: "./src/content/extractor.ts", name: "GetCareerExtractor" },
+  autofill: { entry: "./src/content/autofill.ts", name: "GetCareerAutofill" },
 } as const;
 const script = (process.env.EXT_PAGE_SCRIPT as keyof typeof SCRIPTS | undefined) ?? "extractor";
 const { entry, name } = SCRIPTS[script];

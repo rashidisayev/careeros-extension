@@ -1,7 +1,7 @@
 /**
  * Reads the job posting from the page the user has open. Runs inside the page (injected on
  * the user's action with activeTab, or on sites they allowed), returns plain data and keeps
- * nothing. Order, as the CareerOS import pipeline expects:
+ * nothing. Order, as the GetCareer import pipeline expects:
  *   1. schema.org JobPosting (JSON-LD, then microdata)
  *   2. Open Graph and page metadata
  *   3. a site adapter's labelled elements, else a visible heading and the main content

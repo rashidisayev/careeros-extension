@@ -15,7 +15,7 @@ export function createMenus(): void {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
       id: MENU_SAVE_PAGE,
-      title: "Save this job to CareerOS",
+      title: "Save this job to GetCareer",
       contexts: ["page"],
       documentUrlPatterns: ["https://*/*", "http://*/*"],
     });

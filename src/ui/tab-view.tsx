@@ -28,7 +28,7 @@ function display(name: string, f: LocalField | undefined): string | null {
   return f.value;
 }
 
-/** The posting as read from the page (a preview; the review step shows CareerOS's reading). */
+/** The posting as read from the page (a preview; the review step shows GetCareer's reading). */
 export function PostingPreview({ state }: { state: TabState }) {
   const f = state.extraction?.fields ?? {};
   const title = f.title;
@@ -86,7 +86,7 @@ function Tracked({ app, onOpen }: { app: TrackedApplication; onOpen: (path: stri
         </span>
         <Button variant="link" className="text-[0.8125rem]" onClick={() => onOpen(`/applications/${app.application_id}`)}>
           Open <ExternalLink className="size-3.5" aria-hidden />
-          <span className="sr-only">{app.position_title} in CareerOS (opens a new tab)</span>
+          <span className="sr-only">{app.position_title} in GetCareer (opens a new tab)</span>
         </Button>
       </div>
     </li>
@@ -180,7 +180,7 @@ export function TabView({ state, bootstrap, actions, extra }: { state: TabState;
         <div className="grid gap-4">
           <Empty icon={<Lock />} title={`${state.restricted?.name ?? "This site"} isn't read automatically`}>
             <p>
-              {state.restricted?.name ?? "This site"} doesn't allow other services to read its job pages, so CareerOS doesn't. Select the job
+              {state.restricted?.name ?? "This site"} doesn't allow other services to read its job pages, so GetCareer doesn't. Select the job
               description on the page, then save the selection.
             </p>
           </Empty>
@@ -223,7 +223,7 @@ export function TabView({ state, bootstrap, actions, extra }: { state: TabState;
       return (
         <Empty
           icon={<Globe />}
-          title="Click the CareerOS icon to read this page"
+          title="Click the GetCareer icon to read this page"
           action={
             <Button variant="outline" size="sm" onClick={actions.onRetry}>
               <RefreshCw aria-hidden /> Check again
@@ -238,7 +238,7 @@ export function TabView({ state, bootstrap, actions, extra }: { state: TabState;
       );
     case "careeros":
       return (
-        <Empty icon={<Globe />} title="You're on CareerOS">
+        <Empty icon={<Globe />} title="You're on GetCareer">
           <p>Open a job posting on another site to save it here.</p>
         </Empty>
       );

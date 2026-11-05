@@ -1,4 +1,4 @@
-# CareerOS Companion — Supported websites
+# GetCareer Companion — Supported websites
 
 The extension works on any public `https` (or `http`) job page that it is allowed to read,
 except the platforms listed under *Restricted*. It reads a page only after you click the
@@ -16,7 +16,7 @@ panel. Code: `src/extraction`, `src/shared/policy.ts`.
 | 5 | Open Graph and meta tags, the document title, `<link rel=canonical>` | Interpreted | `meta.ts` |
 | 6 | Your corrections in the review form | Edited | `ui/review.tsx` |
 
-The extension sends these raw readings, not its conclusions. The CareerOS API repeats the
+The extension sends these raw readings, not its conclusions. The GetCareer API repeats the
 extraction with its own code (and AI, only with your consent) and decides the values and tags
 you review. The extension's own reading is used only for the preview and the status lookup.
 
@@ -64,14 +64,14 @@ saving always goes through the review.
 | StepStone | `stepstone.*` |
 | Monster | `monster.*` |
 
-Their terms of service forbid automated access, and CareerOS already refuses to fetch their
-links (`docs/JOB-IMPORT.md` in the CareerOS repo). An extension reading the page counts as automated
+Their terms of service forbid automated access, and GetCareer already refuses to fetch their
+links (`docs/JOB-IMPORT.md` in the GetCareer repo). An extension reading the page counts as automated
 access, so the same rule applies:
 
 - The extractor is **never** injected into these pages, and no per-site access can be granted
   for them.
 - For a posting address (for example `linkedin.com/jobs/view/<id>`, `indeed.com/viewjob?jk=…`),
-  the extension looks up the URL in CareerOS and shows the status of the application you
+  the extension looks up the URL in GetCareer and shows the status of the application you
   track. Feeds, profiles and searches are not looked up.
 - **Save selected text**: you select the description on the page and click the button or
   the context menu. The extension reads only the selected text (`getSelection()`, the same as

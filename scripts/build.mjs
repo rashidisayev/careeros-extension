@@ -9,7 +9,8 @@
  *   node scripts/build.mjs --mode production|development [--target chrome|edge] [--watch] [--e2e] [--sideload]
  *   --sideload: a production build that keeps the fixed development key, for loading unpacked
  *   (stable id ajbdeolccbgjinhdmllogiefhmcogpma, allowed by the server). Never for the stores.
- *   CAREEROS_URL=https://staging.example node scripts/build.mjs --mode production
+ *   GETCAREER_URL=https://staging.example node scripts/build.mjs --mode production
+ *   (CAREEROS_URL, the variable's name before the GetCareer rename, is still accepted.)
  */
 import { execFileSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -32,14 +33,14 @@ const { values } = parseArgs({
 const mode = values.mode === "development" ? "development" : "production";
 const target = values.target === "edge" ? "edge" : "chrome";
 const pkg = JSON.parse(readFileSync(`${root}/package.json`, "utf8"));
-const careerosUrl = process.env.CAREEROS_URL || (mode === "production" ? "https://career.isayev.app" : "http://localhost:3000");
+const careerosUrl = process.env.GETCAREER_URL || process.env.CAREEROS_URL || (mode === "production" ? "https://getcareer.io" : "http://localhost:3000");
 const e2e = values.e2e;
 const sideload = values.sideload;
 if (e2e && mode === "production") throw new Error("--e2e is for development builds only");
 const outDir = `${root}/dist${e2e ? "-e2e" : target === "edge" ? "-edge" : ""}`;
 
 if (mode === "production" && !careerosUrl.startsWith("https://")) {
-  throw new Error("Production builds must talk to CareerOS over https");
+  throw new Error("Production builds must talk to GetCareer over https");
 }
 
 process.env.EXT_MODE = mode;
@@ -56,11 +57,11 @@ for (const script of ["extractor", "autofill"]) {
   await build({ configFile: `${root}/vite.extractor.config.ts`, mode, build: { watch } });
 }
 
-// Icons: PNGs rendered from the CareerOS mark (scripts/careeros-mark-512.png, a copy of
-// apps/web/public/brand/careeros-mark-512.png in the CareerOS repo) when missing.
+// Icons: PNGs rendered from the GetCareer mark (scripts/getcareer-mark-512.png, a copy of
+// apps/web/public/brand/getcareer-mark-512.png in the GetCareer repo) when missing.
 const icons = `${root}/public/icons`;
 mkdirSync(icons, { recursive: true });
-const source = `${root}/scripts/careeros-mark-512.png`;
+const source = `${root}/scripts/getcareer-mark-512.png`;
 for (const size of [16, 32, 48, 128]) {
   const file = `${icons}/${size}.png`;
   if (!existsSync(file)) {
@@ -71,4 +72,4 @@ for (const size of [16, 32, 48, 128]) {
 cpSync(icons, `${outDir}/icons`, { recursive: true });
 
 writeFileSync(`${outDir}/manifest.json`, `${JSON.stringify(manifest({ version: pkg.version, careerosUrl, mode, target, e2e, sideload }), null, 2)}\n`);
-console.log(`CareerOS Companion ${pkg.version} (${mode}, ${target}) -> ${outDir}  [CareerOS: ${careerosUrl}]`);
+console.log(`GetCareer Companion ${pkg.version} (${mode}, ${target}) -> ${outDir}  [GetCareer: ${careerosUrl}]`);

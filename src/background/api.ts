@@ -1,5 +1,5 @@
 /**
- * Authenticated calls to CareerOS. Every endpoint the extension uses is listed here; they are
+ * Authenticated calls to GetCareer. Every endpoint the extension uses is listed here; they are
  * the same endpoints the web app uses (job imports, applications) plus the two extension
  * endpoints (bootstrap, lookup). See docs/API_INTEGRATION.md.
  */

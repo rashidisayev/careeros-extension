@@ -106,7 +106,7 @@ function Popup() {
           </span>
           <Button variant="link" className="text-xs" onClick={() => open("/applications")}>
             Your applications <ExternalLink className="size-3" aria-hidden />
-            <span className="sr-only">(opens CareerOS in a new tab)</span>
+            <span className="sr-only">(opens GetCareer in a new tab)</span>
           </Button>
         </footer>
       )}

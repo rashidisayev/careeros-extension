@@ -47,7 +47,7 @@ function Progress({ imp, slow }: { imp: ImportOut | null; slow: boolean }) {
       <p role="status" className="sr-only">
         {active}
       </p>
-      {slow && <p className="text-xs text-muted-foreground">This is taking longer than usual. You can keep browsing; it continues in CareerOS.</p>}
+      {slow && <p className="text-xs text-muted-foreground">This is taking longer than usual. You can keep browsing; it continues in GetCareer.</p>}
     </div>
   );
 }
@@ -146,7 +146,7 @@ function Saved({ app, onDone }: { app: ApplicationDetail; onDone: () => void }) 
       </div>
       <div className="grid gap-2">
         <Button onClick={() => send({ type: "app.open", path: `/applications/${app.id}` }).catch(() => undefined)}>
-          Open in CareerOS <ExternalLink aria-hidden />
+          Open in GetCareer <ExternalLink aria-hidden />
           <span className="sr-only">(opens a new tab)</span>
         </Button>
         <Button variant="ghost" onClick={onDone}>
@@ -216,8 +216,8 @@ export function ImportFlow({
   const canRetry = data.status === "failed";
   return (
     <div className="grid gap-4">
-      <Alert tone="warning" title="CareerOS couldn't read this posting">
-        <p>{data.error_message ?? "Paste the job description below and CareerOS reads the details from it."}</p>
+      <Alert tone="warning" title="GetCareer couldn't read this posting">
+        <p>{data.error_message ?? "Paste the job description below and GetCareer reads the details from it."}</p>
       </Alert>
       <PasteForm
         title="Paste the job description"

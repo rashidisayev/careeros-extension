@@ -1,5 +1,5 @@
 /**
- * Review and save: every value CareerOS read is shown with where it came from ("From the
+ * Review and save: every value GetCareer read is shown with where it came from ("From the
  * posting", "Interpreted", "Please check", "Not found", "Edited") and can be corrected.
  * Nothing is saved until Save. A likely duplicate is never merged or changed: you open the
  * existing application, or save this one as a separate application on purpose.
@@ -249,7 +249,7 @@ export function Review({
         <MatchPreview match={imp.match} />
       ) : bootstrap?.features.job_match && !bootstrap.features.job_match.enabled && bootstrap.features.job_match.reason === "no_direction" ? (
         <p className="text-xs text-muted-foreground">
-          Set up a career direction in CareerOS to see how well jobs fit.{" "}
+          Set up a career direction in GetCareer to see how well jobs fit.{" "}
           <Button variant="link" className="text-xs" onClick={() => openApp("/profile")}>
             Set it up
           </Button>
@@ -368,7 +368,7 @@ export function Review({
           </>
         ) : (
           <Button type="submit" busy={saving}>
-            Save to CareerOS
+            Save to GetCareer
           </Button>
         )}
         <Button variant="ghost" onClick={onCancel} disabled={saving}>
@@ -400,7 +400,7 @@ function Duplicates({ duplicates, onOpen }: { duplicates: ImportDuplicate[]; onO
               </span>
               <Button variant="link" className="text-[0.8125rem]" onClick={() => onOpen(`/applications/${d.application_id}`)}>
                 Open <ExternalLink className="size-3.5" aria-hidden />
-                <span className="sr-only">{d.position_title} in CareerOS (opens a new tab)</span>
+                <span className="sr-only">{d.position_title} in GetCareer (opens a new tab)</span>
               </Button>
             </div>
           </li>

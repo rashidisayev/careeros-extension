@@ -35,7 +35,7 @@ describe("JSON-LD JobPosting", () => {
     expect(ex().fields.salary?.value).toBe("EUR 85,000–105,000 per year");
   });
 
-  it("sends only the JobPosting properties CareerOS reads", () => {
+  it("sends only the JobPosting properties GetCareer reads", () => {
     const { capture } = ex();
     expect(capture.json_ld).toHaveLength(1);
     const posting = capture.json_ld[0]!;

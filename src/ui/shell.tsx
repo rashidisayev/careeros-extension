@@ -64,7 +64,7 @@ export function SessionGate({
   if (session.updateRequired) {
     return (
       <Alert tone="warning" title="Update the extension">
-        <p>This version of CareerOS Companion is too old for CareerOS. Update it in your browser's extension settings, then reopen it.</p>
+        <p>This version of GetCareer Companion is too old for GetCareer. Update it in your browser's extension settings, then reopen it.</p>
       </Alert>
     );
   }
@@ -74,7 +74,7 @@ export function SessionGate({
         <div className="mb-4">
           <Alert
             tone="warning"
-            title="CareerOS can't be reached right now"
+            title="GetCareer can't be reached right now"
             action={
               <Button size="sm" variant="outline" onClick={() => onReload(true)}>
                 <RefreshCw aria-hidden /> Try again

@@ -18,7 +18,7 @@ export type Theme = "dark" | "light" | "system";
 
 export type Settings = {
   version: number;
-  /** CareerOS defaults to dark (product decision); light and system are supported. */
+  /** GetCareer defaults to dark (product decision); light and system are supported. */
   theme: Theme;
   /** Stage a saved posting starts in. */
   defaultStatus: ApplicationStatus;
@@ -26,7 +26,7 @@ export type Settings = {
   followTabs: boolean;
   /** Write structured diagnostics to the console (no personal data). */
   diagnostics: boolean;
-  /** CareerOS AutoFill: on/off, what it may fill, history, suggested answers, default CV. */
+  /** GetCareer AutoFill: on/off, what it may fill, history, suggested answers, default CV. */
   autofill: AutofillSettings;
 };
 

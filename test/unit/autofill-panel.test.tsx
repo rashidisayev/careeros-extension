@@ -105,7 +105,7 @@ describe("AutoFill review", () => {
     expect(host.textContent).toContain("Employer · role 2");
   });
 
-  it("drafts an answer to an open question, unticked, with what CareerOS couldn't check", async () => {
+  it("drafts an answer to an open question, unticked, with what GetCareer couldn't check", async () => {
     const plan = planOf();
     render(plan);
     const before = byText(/^Fill \d+ fields?$/).textContent;
@@ -119,14 +119,14 @@ describe("AutoFill review", () => {
     expect(req).toMatchObject({ language: "en", questions: [{ text: "Why do you want to join Brightwave?" }] });
   });
 
-  it("explains the consent CareerOS needs instead of offering drafts", () => {
+  it("explains the consent GetCareer needs instead of offering drafts", () => {
     const plan = planOf();
     render(plan, { ...ANSWERS, enabled: false, reason: "consent_required" });
     expect(byText("Suggest an answer")).toBeUndefined();
-    expect(host.textContent).toContain("allow AI processing in your CareerOS settings");
+    expect(host.textContent).toContain("allow AI processing in your GetCareer settings");
   });
 
-  it("offers neither drafts nor 'Remember' when the server keeps no answers (an older CareerOS)", async () => {
+  it("offers neither drafts nor 'Remember' when the server keeps no answers (an older GetCareer)", async () => {
     const plan = planOf();
     render(plan, { ...ANSWERS, enabled: false, reason: null, remember: false });
     expect(byText("Suggest an answer")).toBeUndefined();
