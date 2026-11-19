@@ -75,6 +75,38 @@ describe("http", () => {
     );
     await expect(http("/x", { method: "POST", timeoutMs: 20 })).rejects.toMatchObject({ code: "timeout" });
   });
+
+  it("resends an idempotent POST with the same key after a network error or 502, never after 503", async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
+      .mockResolvedValueOnce(json(502, {}))
+      .mockResolvedValueOnce(json(202, { id: "r" }));
+    vi.stubGlobal("fetch", fetchMock);
+    const p = http("/job-resumes", { method: "POST", body: {}, headers: { "Idempotency-Key": "ext-1" }, idempotent: true });
+    await vi.runAllTimersAsync();
+    await expect(p).resolves.toEqual({ id: "r" });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    const keys = fetchMock.mock.calls.map((c) => ((c as unknown as [string, RequestInit])[1].headers as Record<string, string>)["Idempotency-Key"]);
+    expect(keys).toEqual(["ext-1", "ext-1", "ext-1"]);
+    vi.useRealTimers();
+
+    const busy = vi.fn(async () => json(503, { error: { code: "generation_unavailable", message: "x" } }));
+    vi.stubGlobal("fetch", busy);
+    await expect(http("/job-resumes", { method: "POST", body: {}, headers: { "Idempotency-Key": "ext-2" }, idempotent: true })).rejects.toMatchObject({ code: "generation_unavailable" });
+    expect(busy).toHaveBeenCalledTimes(1);
+  });
+
+  it("never lets extra headers carry credentials", async () => {
+    const fetchMock = vi.fn(async () => json(200, {}));
+    vi.stubGlobal("fetch", fetchMock);
+    await http("/x", { token: "tok", headers: { Authorization: "Bearer other", cookie: "a=b", "Idempotency-Key": "ext-3" } });
+    const h = (fetchMock.mock.calls[0] as unknown as [string, RequestInit])[1].headers as Record<string, string>;
+    expect(h.Authorization).toBe("Bearer tok");
+    expect(h.cookie).toBeUndefined();
+    expect(h["Idempotency-Key"]).toBe("ext-3");
+  });
 });
 
 describe("authenticated calls", () => {

@@ -121,6 +121,12 @@ test.beforeAll(async () => {
   });
   sw = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
   extensionId = new URL(sw.url()).host;
+  // The local GetCareer may have a real AI provider: these tests never ask for a tailored resume
+  // (test/e2e/attach.spec.ts and the unit tests cover that flow without one).
+  await sw.evaluate(async () => {
+    const got = (await chrome.storage.local.get("settings")).settings as { version?: number; autofill?: object } | undefined;
+    await chrome.storage.local.set({ settings: { ...got, version: got?.version ?? 4, autofill: { ...got?.autofill, tailoredResume: false } } });
+  });
 });
 
 test.afterAll(async () => {
@@ -134,6 +140,8 @@ test("loads with the expected id, permissions and no errors", async () => {
   const manifest = await sw.evaluate(() => chrome.runtime.getManifest());
   expect(manifest.permissions).toEqual(["activeTab", "scripting", "storage", "sidePanel", "identity", "contextMenus"]);
   expect(manifest.optional_host_permissions).toEqual(["https://*/*"]);
+  // Asked for only when the user saves a tailored resume.
+  expect(manifest.optional_permissions).toEqual(["downloads"]);
 });
 
 test("not connected: the popup offers to connect", async () => {

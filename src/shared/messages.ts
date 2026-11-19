@@ -29,6 +29,9 @@ import type {
   SavedAnswer,
   UndoReport,
 } from "../autofill/types";
+import type { PageFile } from "../autofill/types";
+import type { ResumeFormat } from "./api-types";
+import type { ResumeDetails, ResumeInput, ResumeProgress, ResumeView } from "./resumes";
 import type { Settings } from "./settings";
 import type { ErrorInfo, SessionInfo, TabState } from "./types";
 import type { LogEntry } from "./log";
@@ -63,6 +66,12 @@ export type Request =
   | { type: "autofill.history" }
   | { type: "autofill.historyDelete"; id?: string }
   | { type: "autofill.cvs" }
+  | { type: "resume.details"; tabId: number }
+  | { type: "resume.create"; tabId: number; pageUrl: string; input: ResumeInput }
+  | { type: "resume.progress"; resumeId: string }
+  | { type: "resume.get"; resumeId: string }
+  | { type: "resume.regenerate"; resumeId: string; language?: "en" | "de" }
+  | { type: "resume.file"; resumeId: string; format: ResumeFormat }
   | { type: "data.clear" };
 
 export type ResponseMap = {
@@ -95,6 +104,12 @@ export type ResponseMap = {
   "autofill.history": HistoryEntry[];
   "autofill.historyDelete": null;
   "autofill.cvs": DocumentRef[];
+  "resume.details": ResumeDetails;
+  "resume.create": ResumeView;
+  "resume.progress": ResumeProgress;
+  "resume.get": ResumeView;
+  "resume.regenerate": ResumeView;
+  "resume.file": PageFile;
   "data.clear": Settings;
 };
 
@@ -150,7 +165,7 @@ function validRef(v: unknown): v is FieldRef {
 }
 
 const isIndex = (v: unknown) => Number.isInteger(v) && (v as number) >= 0 && (v as number) < 5000;
-const DOC_REF = /^(resume|generated):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const DOC_REF = /^(resume|generated|job-resume):[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 function validValue(val: unknown): val is FillValue {
   if (!isObj(val)) return false;
@@ -228,6 +243,41 @@ function validQuestion(v: unknown): v is AnswerQuestion {
 }
 
 const refs = (v: unknown, max = MAX_FILL): v is FieldRef[] => Array.isArray(v) && v.length <= max && v.every(validRef);
+
+/** Optional text of at most `max` characters (null or a string). */
+const optText = (v: unknown, max: number) => v === null || (typeof v === "string" && v.length <= max);
+
+/** The job as the user confirmed it: the API's limits, nothing else (docs/api/job-resumes.md). */
+function validResumeInput(v: unknown): v is ResumeInput {
+  return (
+    isObj(v) &&
+    (v.applicationId === null || isUuid(v.applicationId)) &&
+    optText(v.title, 300) &&
+    optText(v.company, 200) &&
+    optText(v.description, 50_000) &&
+    optText(v.location, 300) &&
+    optText(v.seniority, 60) &&
+    (v.url === null || (isUrl(v.url) && (v.url as string).length <= 1000)) &&
+    Array.isArray(v.requirements) &&
+    v.requirements.length <= 50 &&
+    v.requirements.every((r) => typeof r === "string" && r.trim().length > 0 && r.length <= 300) &&
+    (v.language === "en" || v.language === "de")
+  );
+}
+
+function cleanResumeInput(v: ResumeInput): ResumeInput {
+  return {
+    applicationId: v.applicationId,
+    title: v.title,
+    company: v.company,
+    description: v.description,
+    location: v.location,
+    seniority: v.seniority,
+    requirements: [...v.requirements],
+    language: v.language,
+    url: v.url,
+  };
+}
 
 /** Only the fields named, with only their own keys (nothing else crosses into the page). */
 function cleanItem(i: FillItem): FillItem {
@@ -334,6 +384,21 @@ export function parseRequest(raw: unknown): Request | null {
       return isUuid(r.id) ? { type: r.type, id: r.id } : null;
     case "autofill.historyDelete":
       return r.id === undefined || isUuid(r.id) ? { type: r.type, ...(r.id ? { id: r.id as string } : {}) } : null;
+    case "resume.details":
+      return isTab(r.tabId) ? { type: r.type, tabId: r.tabId } : null;
+    case "resume.create":
+      return isTab(r.tabId) && isUrl(r.pageUrl) && validResumeInput(r.input)
+        ? { type: r.type, tabId: r.tabId, pageUrl: r.pageUrl, input: cleanResumeInput(r.input) }
+        : null;
+    case "resume.progress":
+    case "resume.get":
+      return isUuid(r.resumeId) ? { type: r.type, resumeId: r.resumeId } : null;
+    case "resume.regenerate":
+      return isUuid(r.resumeId) && (r.language === undefined || r.language === "en" || r.language === "de")
+        ? { type: r.type, resumeId: r.resumeId, ...(r.language ? { language: r.language as "en" | "de" } : {}) }
+        : null;
+    case "resume.file":
+      return isUuid(r.resumeId) && (r.format === "pdf" || r.format === "docx") ? { type: r.type, resumeId: r.resumeId, format: r.format } : null;
     case "autofill.undo":
       return isTab(r.tabId) && (r.fields === undefined || refs(r.fields))
         ? { type: r.type, tabId: r.tabId, fields: (r.fields as FieldRef[] | undefined)?.map((a) => ({ frameId: a.frameId, fieldId: a.fieldId })) }

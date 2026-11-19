@@ -154,6 +154,38 @@ describe("files", () => {
     expect(replaced!.status).toBe("filled");
   });
 
+  describe("did the form take it?", () => {
+    const tailored = (format: "pdf" | "docx" = "pdf"): FillValue => ({ kind: "file", ref: "job-resume:6f1c2a9e-3b7d-4c51-9a0e-2d8f4b7c1e55", format, name: `Anna_Schmidt_Resume.${format}` });
+    const filesFor = { [fileKey("job-resume:6f1c2a9e-3b7d-4c51-9a0e-2d8f4b7c1e55", "pdf")]: PDF };
+    beforeEach(() => open("upload-widgets.html"));
+
+    it("counts a file as attached when the upload widget shows it", async () => {
+      const [out] = await page.fill([item("Resume/CV", tailored())], 0, ORIGIN, filesFor);
+      expect(out!.status).toBe("filled");
+      expect($<HTMLElement>("#drop-zone .chosen").textContent).toBe("Anna_Schmidt_Resume.pdf");
+    });
+
+    it("doesn't claim it when the page shows nothing, and outlines the field for the user", async () => {
+      vi.useFakeTimers();
+      try {
+        const run = page.fill([item("Cover letter", tailored())], 0, ORIGIN, filesFor);
+        await vi.advanceTimersByTimeAsync(3500);
+        const [out] = await run;
+        expect(out!.status).toBe("unconfirmed");
+        expect($<HTMLElement>("#silent").style.outline).not.toBe("");
+        // What AutoFill put there can still be taken back.
+        expect(page.undo(0).map((r) => r.status)).toEqual(["restored"]);
+      } finally {
+        vi.useRealTimers();
+      }
+    });
+
+    it("reports a file the form refused", async () => {
+      const [out] = await page.fill([item("Portfolio", tailored())], 0, ORIGIN, filesFor);
+      expect(out!.status).toBe("file_rejected");
+    });
+  });
+
   it("reads accept lists like the browser", () => {
     const pdf = { name: "a.pdf", mime: "application/pdf" };
     const docx = { name: "a.docx", mime: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" };

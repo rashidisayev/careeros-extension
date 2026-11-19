@@ -418,6 +418,7 @@ function AutofillSettingsView({ value, onChange }: { value: AutofillSettings; on
   const documentsOn = features?.autofill_documents?.enabled === true;
   const savedOn = features?.autofill_saved_answers?.enabled === true;
   const historyOn = features?.autofill_history?.enabled === true;
+  const resumesFeature = features?.job_resumes;
   return (
     <div className="grid gap-5">
       <Toggle
@@ -470,6 +471,19 @@ function AutofillSettingsView({ value, onChange }: { value: AutofillSettings; on
           <DefaultCv value={value.defaultCv} onChange={(defaultCv) => set({ defaultCv })} connected={connected} />
         </fieldset>
       )}
+      {resumesFeature && (resumesFeature.enabled || resumesFeature.reason === "consent_required") && (
+        <fieldset className="grid gap-3" disabled={!value.enabled}>
+          <legend className="pb-2 text-[0.8125rem] font-semibold">Tailored resumes</legend>
+          <Toggle
+            id="autofill-tailored-resume"
+            checked={value.tailoredResume}
+            onChange={(tailoredResume) => set({ tailoredResume })}
+            title="Create a tailored resume when I fill an application"
+            hint="On “Fill application”, GetCareer writes a resume for that job from your Career Profile and the extension attaches it to the form's CV field when it's ready. It counts towards your hourly AI documents, and a job you don't track yet is added to GetCareer. Off: only when you ask in the side panel."
+          />
+          {!resumesFeature.enabled && <p className="max-w-prose text-xs text-muted-foreground">To use them, turn on AI processing in GetCareer (CV & Documents).</p>}
+        </fieldset>
+      )}
       {(answersFeature || savedOn) && (
         <fieldset className="grid gap-3" disabled={!value.enabled}>
           <legend className="pb-2 text-[0.8125rem] font-semibold">Suggested answers to open questions</legend>
@@ -501,7 +515,7 @@ function AutofillSettingsView({ value, onChange }: { value: AutofillSettings; on
         </fieldset>
       )}
       <p className="max-w-prose text-xs text-muted-foreground">
-        The values come from your Career Profile in GetCareer and are fetched when you open AutoFill; the extension doesn't store them. Files are downloaded from GetCareer only when you fill a form with them.{" "}
+        The values come from your Career Profile in GetCareer and are fetched when you open AutoFill; the extension doesn't store them. Files are downloaded from GetCareer only when you fill a form with them or save them yourself.{" "}
         <Button variant="link" className="text-xs" onClick={() => send({ type: "app.open", path: "/profile" }).catch(() => undefined)}>
           Edit your Career Profile <ExternalLink className="size-3" aria-hidden />
           <span className="sr-only">(opens a new tab)</span>

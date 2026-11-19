@@ -322,8 +322,76 @@ function attach(input: HTMLInputElement, file: PageFile): FillStatus {
   const dt = new view.DataTransfer();
   dt.items.add(new view.File([bytes], file.name, { type: file.mime }));
   nativeSet(input, "files", dt.files);
+  // The browser refused the list (it never does for a real file input): nothing is attached.
+  if (!Array.from(input.files ?? []).some((f) => f.name === file.name)) return "failed";
   fire(input, "input", "change");
   return "filled";
+}
+
+// ---- Did the form take the file? -----------------------------------------------------------
+
+/** How long the page has to show that it took a file, and how often it is looked at. */
+export const CONFIRM_MS = 3000;
+const CONFIRM_STEP_MS = 100;
+const UPLOAD_ERROR =
+  /\b(not supported|unsupported|invalid file|too (large|big)|exceeds|upload(ing)? failed|failed to upload|could ?n[o']t (be )?upload|nicht unterstützt|ungültig|zu groß|fehlgeschlagen|nicht hochgeladen)\b/i;
+
+/** The part of the form around a file input: its widget, without the form's other file inputs. */
+function scopeOf(input: HTMLInputElement): Element {
+  let scope: Element = input.parentElement ?? input;
+  for (let el = scope.parentElement, depth = 0; el && depth < 4 && el.tagName !== "FORM" && el.tagName !== "BODY"; el = el.parentElement, depth++) {
+    if (el.querySelectorAll('input[type="file"]').length > 1) break;
+    scope = el;
+  }
+  return scope;
+}
+
+/** Where the page shows a file name: text, and values of other inputs (some widgets use one). */
+function shownCount(doc: Document, name: string): number {
+  const stem = name.replace(/\.[a-z0-9]{2,5}$/i, "");
+  const needle = (stem.length >= 6 ? stem : name).toLowerCase();
+  const count = (text: string) => text.toLowerCase().split(needle).length - 1;
+  let n = count(doc.body?.textContent ?? "");
+  for (const el of Array.from(doc.querySelectorAll<HTMLInputElement>('input:not([type="file"]):not([type="hidden"])'))) n += count(el.value ?? "");
+  return n;
+}
+
+function errorsIn(scope: Element): number {
+  return (scope.textContent ?? "").split(/\n|(?<=[.!])\s/).filter((t) => UPLOAD_ERROR.test(t)).length;
+}
+
+/** A file input the browser shows itself, with the chosen file's name next to its button. */
+function nativeVisible(input: HTMLInputElement): boolean {
+  if (input.hidden || input.closest("[hidden]")) return false;
+  const style = input.ownerDocument.defaultView?.getComputedStyle(input);
+  if (style && (style.display === "none" || style.visibility === "hidden" || style.opacity === "0")) return false;
+  const v = input as HTMLInputElement & { checkVisibility?: (o?: object) => boolean };
+  if (typeof v.checkVisibility !== "function") {
+    // No layout (tests): judged by what the page says about it.
+    const hiddenStyle = /^(0|1)px$/.test(style?.width ?? "") || /rect\(0/.test(style?.clip ?? "") || /(^|\s)(sr-only|visually-hidden|hidden)(\s|$)/.test(input.className);
+    return !hiddenStyle;
+  }
+  if (!v.checkVisibility({ opacityProperty: true, visibilityProperty: true })) return false;
+  const r = input.getBoundingClientRect();
+  return r.width >= 8 && r.height >= 8;
+}
+
+/**
+ * After a file was put into an input: did the form take it? Yes when the page shows the file's
+ * name (an upload widget lists it, or the browser's own visible control holds it); no when an
+ * error appears next to the field; otherwise unknown. Never "filled" on hope alone.
+ */
+async function confirmAttach(input: HTMLInputElement, name: string, before: { shown: number; errors: number }, scope: Element): Promise<FillStatus> {
+  const doc = input.ownerDocument;
+  const deadline = Date.now() + CONFIRM_MS;
+  for (;;) {
+    await sleep(CONFIRM_STEP_MS);
+    if (errorsIn(scope) > before.errors) return "file_rejected";
+    if (shownCount(doc, name) > before.shown) return "filled";
+    const holds = Array.from(input.files ?? []).some((f) => f.name === name);
+    if (holds && input.isConnected && nativeVisible(input)) return "filled";
+    if (Date.now() >= deadline) return "unconfirmed";
+  }
 }
 
 // ---- Fill and undo -------------------------------------------------------------------------
@@ -373,7 +441,11 @@ export async function fill(
         status = await choose(els[0] as HTMLElement, item.value.picks);
       } else if (item.value.kind === "file") {
         const file = files[fileKey(item.value.ref, item.value.format)];
-        status = file ? attach(els[0] as HTMLInputElement, { ...file, name: item.value.name }) : "file_unavailable";
+        const input = els[0] as HTMLInputElement;
+        const scope = scopeOf(input);
+        const before = { shown: shownCount(doc, item.value.name), errors: errorsIn(scope) };
+        status = file ? attach(input, { ...file, name: item.value.name }) : "file_unavailable";
+        if (status === "filled") status = await confirmAttach(input, item.value.name, before, scope);
       } else {
         const target = toSnapshot(item.value, els);
         if (!target) {
@@ -390,9 +462,10 @@ export async function fill(
         apply(els, target);
         status = "filled";
       }
-      if (status === "filled") {
+      if (status === "filled" || status === "unconfirmed") {
         state.written.set(item.fieldId, { before: prev?.before ?? now, after: snapshot(els) });
-        highlight(state, els, "filled");
+        // A file the form didn't show: outlined for the user to check.
+        highlight(state, els, status === "filled" ? "filled" : "attention");
       }
       result(status);
     } catch {

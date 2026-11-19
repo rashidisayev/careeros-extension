@@ -250,3 +250,67 @@ export type ApplicationDetail = {
 export type ApiErrorBody = {
   error: { code: string; message: string; details?: unknown; request_id?: string | null };
 };
+
+// ---- Job-specific resumes (apps/api/app/job_resumes/schemas.py, docs/api/job-resumes.md) ----
+
+export type ResumeFormat = "pdf" | "docx";
+/** "pending" | "generating" | "ready" | "failed" | "deleted"; the list may grow, so a string. */
+export type JobResumeStatus = string;
+
+export type JobResumeFile = {
+  id: string;
+  format: string;
+  filename: string;
+  content_type: string;
+  size_bytes: number;
+  created_at: string;
+};
+
+export type JobResumeOut = {
+  id: string;
+  application_id: string;
+  version: number;
+  is_current: boolean;
+  status: JobResumeStatus;
+  job_title: string;
+  company_name: string;
+  posting_url: string | null;
+  location: string | null;
+  seniority: string | null;
+  language: string;
+  requirements: { listed?: string[]; supported?: string[]; unsupported?: string[]; keyword_coverage?: number | null };
+  review: { notes: string[]; issues: string[]; flagged_bullets: number } | null;
+  formats: string[];
+  files: JobResumeFile[];
+  error: { code: string; message: string } | null;
+  generated_at: string | null;
+  expires_at: string | null;
+  deletion_reason: string | null;
+  created_at: string;
+};
+
+export type JobResumeStatusOut = {
+  id: string;
+  application_id: string;
+  version: number;
+  status: JobResumeStatus;
+  ready: boolean;
+  formats: string[];
+  error: { code: string; message: string } | null;
+  poll_after_seconds: number | null;
+  expires_at: string | null;
+  deletion_reason: string | null;
+};
+
+/** POST /job-resumes. Without application_id, title, company and description are required. */
+export type JobResumeCreate = {
+  application_id?: string;
+  job_title?: string;
+  company?: string;
+  job_description?: string;
+  posting_url?: string;
+  location?: string;
+  seniority?: string;
+  requirements?: string[];
+  language: "en" | "de";
+};

@@ -11,6 +11,7 @@ import { restrictedPlatformFor } from "../shared/policy";
 import { Alert, Button } from "../ui/components";
 import { send } from "../ui/client";
 import { AutofillHint, AutofillPanel, answersAccess, autofillAvailable, useAutofill } from "../ui/autofill-view";
+import { resumeAccess } from "../ui/resume-view";
 import { useActiveTab, useSession, useSettings, useTabState, useTheme } from "../ui/hooks";
 import { ImportFlow, PasteForm } from "../ui/import-view";
 import { Header, INTENT_KEY, SessionGate, type Intent } from "../ui/shell";
@@ -154,6 +155,7 @@ function Panel() {
                       state={autofill}
                       excluded={settings.autofill.excluded}
                       answers={answersAccess(s.bootstrap, settings.autofill)}
+                      resumes={resumeAccess(s.bootstrap, settings.autofill)}
                       onExclude={exclude}
                       onOpen={open}
                       startInReview={intent === "autofill"}

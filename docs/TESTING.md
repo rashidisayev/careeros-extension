@@ -7,11 +7,22 @@ LinkedIn, Indeed or any other live job site.
 |---|---|---|---|
 | Unit | `pnpm test` | Nothing | Extraction, auth, HTTP, message validation, policy, settings, review form, AutoFill (detection, classification, plan, filling, undo, history entries, dates, ATS adapters, list widgets, files, answers, the form watcher, the review panel) |
 | Live API | `pnpm test:live` | Running stack at `localhost:3000` | The extension's API client against the real API and worker |
-| Browser (e2e) | `pnpm test:e2e` | Running stack; Playwright Chromium | The built extension in Chromium: connect window, popup, side panel, save, duplicates, AutoFill |
+| Browser (e2e) | `pnpm test:e2e` | Running stack (only `attach.spec.ts` runs without one); Playwright Chromium | The built extension in Chromium: connect window, popup, side panel, save, duplicates, AutoFill |
 | Backend | `docker compose run --rm -e ENVIRONMENT=test api pytest tests/test_extension.py` | Postgres, Redis | The API additions, including security and tenant isolation |
 
 Type checking: `pnpm typecheck`. Visual and accessibility review: Impeccable on rendered
 snapshots (below).
+
+## Results (2026-11-19, with tailored resumes)
+
+| Suite | Result |
+|---|---|
+| Extension unit | **405 passed**, 17 files (new: `posting` 21, `resumes-background` 23, `resume-panel` 13; 3 more in `autofill-widgets`, 2 in `http`) |
+| Extension live API | **8 passed** |
+| Extension browser | **23 passed**: `attach.spec.ts` 14 (no backend), `extension.spec.ts` 9 (local stack) |
+| Type check, Edge production build | `tsc` clean; built, manifest adds only the optional `downloads` permission |
+
+The backend is a separate project and was not changed or retested here.
 
 ## Results (2026-11-05, with AutoFill Phases 1 to 3)
 
@@ -96,12 +107,24 @@ account's cookie session), and then:
 
 The account is deleted afterwards through the normal account-deletion endpoint.
 
+## Attach tests (`test/e2e/attach.spec.ts`)
+
+Runs without GetCareer: a local server serves the form fixtures, and Playwright's Chromium
+loads AutoFill's built page script (`dist-e2e/autofill.js`) into them with a stubbed
+`chrome.runtime`. Each test attaches a PDF to the CV field the way a tailored resume is
+attached, and checks the reported status against what the page shows: `filled` on the 12
+forms whose file control the browser shows (and the input holds the file's name, type and
+size), `unconfirmed` on Greenhouse's hidden input without its script, and the four widgets of
+`upload-widgets.html` (listed after a delay, emptied but listed, silent, refused). Nothing is
+submitted. `pnpm test:e2e test/e2e/attach.spec.ts` needs only the `dist-e2e` build.
+
 ## Browser tests (`test/e2e/extension.spec.ts`)
 
 `pnpm test:e2e` builds `dist-e2e` (development build, plus `http://127.0.0.1/*` host access
 for the fixture server) and loads it into Playwright's Chromium with `--load-extension`
 (headless, `channel: "chromium"`). The tests run serially against one throwaway account,
-which is deleted at the end:
+which is deleted at the end. Tailored resumes are switched off in this suite, so it never
+starts real AI generation:
 
 1. The extension loads with the expected id and permissions, and without errors.
 2. Not connected: the popup offers to connect.

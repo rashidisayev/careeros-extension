@@ -9,14 +9,16 @@
  * draft answers to open questions. Every one of those is unticked until the user ticks it.
  */
 import { CheckCircle2, ExternalLink, FileText, RefreshCw, Sparkles, Undo2 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EDU_KEYS, KEYS, REUSABLE_KEYS, WORK_KEYS } from "../autofill/keys";
 import { fileName, formatFor } from "../autofill/planner";
-import type { AutofillPlan, AutofillSettings, FieldKey, FillReport, FillValue, PlanItem, PlanReason } from "../autofill/types";
+import type { AutofillPlan, AutofillSettings, DocumentRef, FieldKey, FieldOutcome, FillReport, FillStatus, FillValue, PlanItem, PlanReason } from "../autofill/types";
 import type { Bootstrap } from "../shared/api-types";
+import type { ResumeView } from "../shared/resumes";
 import type { ErrorInfo } from "../shared/types";
 import { Alert, Button, CONTROL, cn } from "./components";
 import { errorInfo, onBroadcast, send } from "./client";
+import { RUNNING, TailoredResumeCard, useTailoredResume, type AttachState, type ResumeAccess, type Stage } from "./resume-view";
 
 /** Codes that mean "AutoFill doesn't apply here"; the tab view already explains the page. */
 const QUIET = new Set(["no_access", "autofill_unsupported", "platform_restricted", "feature_unavailable", "autofill_disabled", "tab_closed", "not_connected"]);
@@ -466,6 +468,7 @@ function Row({
   onValue,
   onExclude,
   answer,
+  note,
 }: {
   item: PlanItem;
   plan?: AutofillPlan;
@@ -475,6 +478,8 @@ function Row({
   onExclude?: () => void;
   /** The answer editor for a question left to the user. */
   answer?: React.ReactNode;
+  /** A line about this field from elsewhere (the tailored resume for the CV field). */
+  note?: string;
 }) {
   const reason = reasonText(item);
   const checkId = `af-on-${key(item)}`;
@@ -503,6 +508,7 @@ function Row({
         )}
       </div>
       {choice && onValue && plan && !answer && (item.action !== "keep" || choice.on) && <ValueEditor item={item} choice={choice} plan={plan} onChange={onValue} />}
+      {note && <p className="text-xs text-muted-foreground">{note}</p>}
       {answer}
       {(reason || onExclude) && (
         <p className="flex flex-wrap items-baseline gap-x-2 text-xs text-muted-foreground">
@@ -553,14 +559,47 @@ const AI_HINT: Record<string, string> = {
   ai_unavailable: "Suggested answers aren't available on this GetCareer server.",
 };
 
-/** What happened after the fill besides the fields: answers saved for other forms. */
-type FillOutcome = { report: FillReport; saved: number; saveFailed: number };
+/**
+ * What happened after the fill besides the fields: answers saved for other forms, and the
+ * form's CV field: filled with the tailored resume (`tailored`), or left for it (`cvLeft`:
+ * attach the tailored resume when it's ready).
+ */
+type FillOutcome = { report: FillReport; saved: number; saveFailed: number; tailored?: FieldOutcome | null; cvLeft?: boolean };
+
+/** The tailored resume as the review offers it for the CV field. */
+type Tailored = { doc: DocumentRef | null; pending: boolean; flagged: number };
+
+/** The form's CV upload (the first, if it has several). */
+export const cvItem = (plan: AutofillPlan | null): PlanItem | null => plan?.items.find((i) => i.kind === "file" && i.document?.kind === "cv") ?? null;
+
+const isTailored = (v: FillValue | null | undefined) => v?.kind === "file" && v.ref.startsWith("job-resume:");
+
+/** The tailored resume as a document AutoFill can attach, once GetCareer has its files. */
+function tailoredDoc(resume: ResumeView | null, stage: Stage): DocumentRef | null {
+  if (stage !== "ready" || !resume || resume.status !== "ready" || !resume.files.length) return null;
+  const main = resume.files.find((f) => f.format === "pdf") ?? resume.files[0]!;
+  return {
+    ref: `job-resume:${resume.id}`,
+    kind: "cv",
+    name: main.filename,
+    formats: resume.files.map((f) => f.format),
+    size: main.size,
+    updated_at: resume.generatedAt ?? resume.createdAt,
+    recommended: true,
+    note: "Tailored for this job",
+  };
+}
+
+function withDoc(plan: AutofillPlan, doc: DocumentRef | null): AutofillPlan {
+  return doc ? { ...plan, documents: [doc, ...plan.documents.filter((d) => d.ref !== doc.ref)] } : plan;
+}
 
 function Review({
-  plan,
+  plan: reviewed,
   tabId,
   excluded,
   answers,
+  tailored,
   onExclude,
   onOpen,
   onDone,
@@ -570,12 +609,29 @@ function Review({
   tabId: number;
   excluded: FieldKey[];
   answers: AnswersAccess;
+  tailored?: Tailored | null;
   onExclude: (k: FieldKey) => void;
   onOpen: (path: string) => void;
   onDone: (r: FillOutcome) => void;
   onCancel: () => void;
 }) {
+  // The tailored resume joins the documents for the CV field once it's ready.
+  const plan = useMemo(() => withDoc(reviewed, tailored?.doc ?? null), [reviewed, tailored?.doc]);
   const [choices, setChoices] = useState(() => initialChoices(plan));
+  // Rows the user changed: the tailored resume never replaces their choice.
+  const touched = useRef(new Set<string>());
+  const cv = cvItem(plan);
+  const tailoredRef = tailored?.doc?.ref ?? null;
+  useEffect(() => {
+    const doc = tailored?.doc;
+    if (!doc || !cv || touched.current.has(key(cv))) return;
+    const format = formatFor(doc, cv.document?.accept ?? null);
+    if (!format) return;
+    // Ticked for an empty field when GetCareer found nothing to check in it; else offered.
+    const on = (tailored?.flagged ?? 0) === 0 && cv.action !== "keep";
+    setChoices((c) => ({ ...c, [key(cv)]: { on, value: { kind: "file", ref: doc.ref, format, name: fileName(doc, format) }, overwrite: cv.action === "keep" } }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tailoredRef, cv?.fieldId]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<ErrorInfo | null>(null);
   const [drafting, setDrafting] = useState<Set<string>>(new Set());
@@ -583,7 +639,10 @@ function Review({
   const [draftError, setDraftError] = useState<ErrorInfo | null>(null);
   const by = (a: PlanItem["action"]) => plan.items.filter((i) => i.action === a);
   const selected = plan.items.filter((i) => choices[key(i)]?.on && choices[key(i)]?.value);
-  const set = (i: PlanItem, patch: Partial<Choice>) => setChoices((c) => ({ ...c, [key(i)]: { ...c[key(i)]!, ...patch } }));
+  const set = (i: PlanItem, patch: Partial<Choice>) => {
+    touched.current.add(key(i));
+    setChoices((c) => ({ ...c, [key(i)]: { ...c[key(i)]!, ...patch } }));
+  };
   const draftable = by("ask").filter((i) => i.draftable && !choices[key(i)]?.value);
 
   const draft = async (items: PlanItem[]) => {
@@ -654,7 +713,12 @@ function Review({
           saveFailed++;
         }
       }
-      onDone({ report, saved, saveFailed });
+      // The CV field: filled with the tailored resume, or left for it while it's being written.
+      const cvChoice = cv ? choices[key(cv)] : undefined;
+      const tailoredItem = cv && cvChoice?.on && isTailored(cvChoice.value) ? cv : null;
+      const result = tailoredItem ? (report.results.find((r) => key(r) === key(tailoredItem)) ?? null) : null;
+      const cvLeft = !!cv && !tailored?.doc && !!tailored?.pending && !(cvChoice?.on && cvChoice.value);
+      onDone({ report, saved, saveFailed, tailored: result, cvLeft });
     } catch (e) {
       setError(errorInfo(e));
     } finally {
@@ -668,6 +732,13 @@ function Review({
       item={i}
       plan={plan}
       choice={choices[key(i)]}
+      note={
+        cv && key(i) === key(cv) && tailored?.pending && !tailored.doc
+          ? "GetCareer is writing a resume for this job. It's attached here when it's ready, unless you tick another document."
+          : cv && key(i) === key(cv) && tailored?.doc && tailored.flagged > 0 && isTailored(choices[key(i)]?.value)
+            ? `The tailored resume has ${tailored.flagged === 1 ? "one point" : `${tailored.flagged} points`} GetCareer couldn't verify in your profile. Read it before you tick it.`
+            : undefined
+      }
       onToggle={(on) => set(i, { on })}
       onValue={(value) => set(i, { value, on: true })}
       onExclude={
@@ -689,6 +760,8 @@ function Review({
   const asked = (i: PlanItem) => {
     const k = key(i);
     const choice = choices[k];
+    // A CV field AutoFill had nothing for: the tailored resume, once it's coming or ready.
+    if (cv && k === key(cv) && (choice?.value || tailored?.pending)) return editable(i);
     if (!i.answerable) return <Row key={k} item={i} />;
     return (
       <Row
@@ -825,8 +898,35 @@ const FAILED: Record<string, string> = {
   wrong_page: "the page changed",
   wrong_file_type: "the field doesn't take this file type",
   file_unavailable: "GetCareer couldn't provide the file",
+  unconfirmed: "the form didn't show the file; check the field on the page",
+  file_rejected: "the form didn't accept the file",
   failed: "couldn't be written",
 };
+
+/** Where an attempt to attach the tailored resume leaves it. */
+export function attachFrom(status: FillStatus | undefined): AttachState {
+  switch (status) {
+    case "filled":
+      return { kind: "attached" };
+    case "has_value":
+    case "user_edited":
+      return { kind: "occupied" };
+    case "unconfirmed":
+      return { kind: "manual", reason: "The form didn't show the file, so it may not be attached. Check the CV field on the page." };
+    case "file_rejected":
+      return { kind: "manual", reason: "The form didn't accept the file." };
+    case "wrong_file_type":
+      return { kind: "manual", reason: "The CV field doesn't take this file type." };
+    case "not_found":
+      return { kind: "manual", reason: "The CV field is no longer on the page." };
+    case "wrong_page":
+      return { kind: "manual", reason: "The page changed." };
+    case "file_unavailable":
+      return { kind: "manual", reason: "GetCareer couldn't provide the file." };
+    default:
+      return { kind: "manual", reason: "It couldn't be attached." };
+  }
+}
 
 function Result({
   plan,
@@ -852,7 +952,8 @@ function Result({
   const label = (r: { frameId: number; fieldId: string }) => plan.items.find((i) => key(i) === key(r))?.label ?? "A field";
   const problems = report.results.filter((r) => r.status !== "filled");
   const filled = report.results.filter((r) => r.status === "filled");
-  const ask = plan.items.filter((i) => i.action === "ask" && (i.required || i.key));
+  const done = new Set(filled.map(key));
+  const ask = plan.items.filter((i) => i.action === "ask" && (i.required || i.key) && !done.has(key(i)));
 
   const undo = async (fields?: { frameId: number; fieldId: string }[]) => {
     setBusy(true);
@@ -965,6 +1066,7 @@ export function AutofillPanel({
   state,
   excluded,
   answers,
+  resumes,
   onExclude,
   onOpen,
   startInReview,
@@ -974,6 +1076,8 @@ export function AutofillPanel({
   state: AutofillState;
   excluded: FieldKey[];
   answers: AnswersAccess;
+  /** Tailored resumes for this account (null: GetCareer doesn't offer them). */
+  resumes?: ResumeAccess | null;
   onExclude: (k: FieldKey) => void;
   onOpen: (path: string) => void;
   startInReview?: boolean;
@@ -987,11 +1091,80 @@ export function AutofillPanel({
   const [changedAtFill, setChangedAtFill] = useState(0);
   // The plan being reviewed stays as it was, even if the page is scanned again meanwhile.
   const [frozen, setFrozen] = useState<AutofillPlan | null>(null);
+
+  // The tailored resume: asked for on "Fill application" (if the user wants that), attached
+  // to the form's CV field once it's ready. AutoFill never waits for it.
+  const access = resumes ?? null;
+  const formPlan = plan ?? frozen;
+  const flow = useTailoredResume(tabId, formPlan?.pageUrl ?? null, !!access?.enabled && !!formPlan?.isApplicationForm, formPlan?.lang ?? null);
+  const [attach, setAttach] = useState<AttachState>({ kind: "none" });
+  const doc = useMemo(() => tailoredDoc(flow.resume, flow.stage), [flow.resume, flow.stage]);
+  const flagged = flow.resume?.review?.flagged ?? 0;
+  const tailored: Tailored | null = access?.enabled ? { doc, pending: RUNNING.includes(flow.stage) || flow.stage === "waiting", flagged } : null;
+  const cv = cvItem(plan ?? frozen);
+
+  const attachNow = useCallback(
+    async (overwrite: boolean) => {
+      const p = plan ?? frozen;
+      const field = cvItem(p);
+      if (!p || !field || !doc) return setAttach({ kind: "manual", reason: field ? null : "This step of the form has no CV field." });
+      const format = formatFor(doc, field.document?.accept ?? null);
+      if (!format) return setAttach({ kind: "manual", reason: "The form's CV field doesn't take PDF or Word files." });
+      setAttach({ kind: "attaching" });
+      try {
+        const report = await send({
+          type: "autofill.fill",
+          tabId,
+          pageUrl: p.pageUrl,
+          items: [{ frameId: field.frameId, fieldId: field.fieldId, frameOrigin: field.frameOrigin, value: { kind: "file", ref: doc.ref, format, name: fileName(doc, format) }, overwrite }],
+          attention: [],
+        });
+        setAttach(attachFrom(report.results[0]?.status));
+      } catch (e) {
+        setAttach({ kind: "manual", reason: errorInfo(e).message });
+      }
+    },
+    [plan, frozen, doc, tabId],
+  );
+
+  /** From the card: points GetCareer couldn't verify need the user's yes first. */
+  const requestAttach = (overwrite: boolean) => {
+    if (flagged > 0 && attach.kind !== "confirm" && !overwrite) return setAttach({ kind: "confirm" });
+    void attachNow(overwrite);
+  };
+
+  // Filled before the resume was ready: attach it now (unless it needs the user's look first).
+  useEffect(() => {
+    if (attach.kind !== "pending" || flow.stage !== "ready" || !doc) return;
+    if (flagged > 0) setAttach({ kind: "confirm" });
+    else void attachNow(false);
+  }, [attach.kind, flow.stage, doc, flagged, attachNow]);
+  // A new version starts over on the form.
+  useEffect(() => {
+    if (flow.stage === "analyzing" && attach.kind !== "pending") setAttach({ kind: "none" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flow.stage]);
+
   const review = useCallback(() => {
     if (!plan) return;
     setFrozen(plan);
     setMode("review");
-  }, [plan]);
+    if (access?.enabled && access.auto && flow.stage === "idle") flow.start();
+  }, [plan, access?.enabled, access?.auto, flow]);
+
+  const card =
+    access && (formPlan?.isApplicationForm || flow.stage !== "idle") ? (
+      <TailoredResumeCard
+        flow={flow}
+        access={access}
+        attach={attach}
+        cvLabel={cv?.label ?? null}
+        formDone={mode === "result"}
+        formLang={formPlan?.lang ?? null}
+        onAttach={requestAttach}
+        onOpen={onOpen}
+      />
+    ) : null;
 
   useEffect(() => {
     onModeChange?.(mode);
@@ -1023,30 +1196,38 @@ export function AutofillPanel({
   }
   if (mode === "review" && frozen) {
     return (
-      <Review
-        plan={frozen}
-        tabId={tabId}
-        excluded={excluded}
-        answers={answers}
-        onExclude={onExclude}
-        onOpen={onOpen}
-        onCancel={() => {
-          setMode("summary");
-          setFrozen(null);
-        }}
-        onDone={(r) => {
-          setOutcome(r);
-          setChangedAtFill(changed);
-          setMode("result");
-        }}
-      />
+      <div className="grid gap-4">
+        {card}
+        <Review
+          plan={frozen}
+          tabId={tabId}
+          excluded={excluded}
+          answers={answers}
+          tailored={tailored}
+          onExclude={onExclude}
+          onOpen={onOpen}
+          onCancel={() => {
+            setMode("summary");
+            setFrozen(null);
+          }}
+          onDone={(r) => {
+            setOutcome(r);
+            setChangedAtFill(changed);
+            setMode("result");
+            if (r.tailored) setAttach(attachFrom(r.tailored.status));
+            else if (r.cvLeft) setAttach({ kind: "pending" });
+          }}
+        />
+      </div>
     );
   }
   if (mode === "result" && outcome && frozen) {
     // Fields the user can still fill: the next step, once the page shows a new form.
     const next = changed > changedAtFill && plan?.isApplicationForm && plan.counts.ready + plan.counts.confirm > 0 ? plan : null;
     return (
-      <Result
+      <div className="grid gap-4">
+        {card}
+        <Result
         plan={frozen}
         outcome={outcome}
         tabId={tabId}
@@ -1069,6 +1250,7 @@ export function AutofillPanel({
           rescan();
         }}
       />
+      </div>
     );
   }
   if (!plan || !plan.isApplicationForm) return null;
@@ -1090,6 +1272,7 @@ export function AutofillPanel({
         }
       />
       <MissingHint plan={plan} onOpen={onOpen} />
+      {card}
     </div>
   );
 }

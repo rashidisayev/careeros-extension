@@ -8,6 +8,7 @@ import { api } from "./api";
 import { answersTab, cvs, deleteAnswer, deleteHistory, doneTab, fillTab, history, saveAnswer, savedAnswers, scanTab, undoTab } from "./autofill";
 import { broadcastSettings } from "./broadcast";
 import { importFromPage, importFromSelection, importFromText, saveImport } from "./imports";
+import { resumeCreate, resumeDetails, resumeFile, resumeGet, resumeProgress, resumeRegenerate } from "./resumes";
 import { connectAccount, disconnectAccount, sessionInfo } from "./session";
 import { patchState, tabState } from "./tabs";
 
@@ -55,6 +56,12 @@ const handlers: Handlers = {
   "autofill.history": () => history(),
   "autofill.historyDelete": (r) => deleteHistory(r.id),
   "autofill.cvs": () => cvs(),
+  "resume.details": (r) => resumeDetails(r.tabId),
+  "resume.create": (r) => resumeCreate(r.tabId, r.pageUrl, r.input),
+  "resume.progress": (r) => resumeProgress(r.resumeId),
+  "resume.get": (r) => resumeGet(r.resumeId),
+  "resume.regenerate": (r) => resumeRegenerate(r.resumeId, r.language),
+  "resume.file": (r) => resumeFile(r.resumeId, r.format),
   "data.clear": async () => {
     // Everything the extension keeps in this browser except the connection itself: page
     // readings, cached account details, open intents, and the settings (back to defaults).

@@ -15,12 +15,21 @@ export type HttpOptions = {
   body?: unknown;
   token?: string | null;
   timeoutMs?: number;
-  /** Extra attempts on network errors and 502/503/504. Only used for GET. */
+  /** Extra attempts on network errors and 502/503/504. Only used for GET (and idempotent POSTs). */
   retries?: number;
+  /** Extra request headers (Idempotency-Key). Never Authorization: that is `token`. */
+  headers?: Record<string, string>;
+  /**
+   * The request carries an Idempotency-Key: repeating it returns the first result, so a POST
+   * may be resent after a network error, a timeout or a gateway error (not after 503, which
+   * GetCareer uses for "couldn't start", retried only when the user asks).
+   */
+  idempotent?: boolean;
 };
 
 const DEFAULT_TIMEOUT = 15_000;
 const RETRY_STATUS = new Set([502, 503, 504]);
+const RETRY_STATUS_IDEMPOTENT = new Set([502, 504]);
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function requestId(): string {
@@ -48,6 +57,7 @@ async function once<T>(path: string, opts: HttpOptions): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT);
   const headers: Record<string, string> = {
+    ...Object.fromEntries(Object.entries(opts.headers ?? {}).filter(([k]) => !/^(authorization|cookie)$/i.test(k))),
     Accept: opts.as === "bytes" ? "*/*" : "application/json",
     "X-Request-ID": rid,
     "X-CareerOS-Client": `extension/${EXTENSION_VERSION} (${BUILD_TARGET})`,
@@ -88,13 +98,15 @@ async function once<T>(path: string, opts: HttpOptions): Promise<T> {
 }
 
 export async function http<T>(path: string, opts: HttpOptions = {}): Promise<T> {
-  const retries = (opts.method ?? "GET") === "GET" ? (opts.retries ?? 2) : 0;
+  const get = (opts.method ?? "GET") === "GET";
+  const retries = get || opts.idempotent ? (opts.retries ?? 2) : 0;
+  const statuses = get ? RETRY_STATUS : RETRY_STATUS_IDEMPOTENT;
   for (let attempt = 0; ; attempt++) {
     try {
       return await once<T>(path, opts);
     } catch (err) {
       const e = err as ExtensionError;
-      const transient = ["network_error", "timeout"].includes(e.code) || (e.status !== undefined && RETRY_STATUS.has(e.status));
+      const transient = ["network_error", "timeout"].includes(e.code) || (e.status !== undefined && statuses.has(e.status));
       if (!transient || attempt >= retries) {
         log.warn("api.error", { path: path.split("?")[0], code: e.code, status: e.status ?? null, request_id: e.requestId ?? null });
         throw err;

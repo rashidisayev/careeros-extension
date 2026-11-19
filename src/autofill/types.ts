@@ -366,7 +366,24 @@ export type FieldRef = { frameId: number; fieldId: string };
 /** One reviewed value to write. `overwrite` replaces something already on the page. */
 export type FillItem = FieldRef & { frameOrigin: string; value: FillValue; overwrite: boolean };
 
-export type FillStatus = "filled" | "has_value" | "user_edited" | "not_found" | "no_option" | "too_long" | "wrong_page" | "wrong_file_type" | "file_unavailable" | "failed";
+/**
+ * "unconfirmed": a file was put into the input but the form didn't show it within a few
+ * seconds; "file_rejected": an upload error appeared next to the field. Neither counts as
+ * attached.
+ */
+export type FillStatus =
+  | "filled"
+  | "has_value"
+  | "user_edited"
+  | "not_found"
+  | "no_option"
+  | "too_long"
+  | "wrong_page"
+  | "wrong_file_type"
+  | "file_unavailable"
+  | "unconfirmed"
+  | "file_rejected"
+  | "failed";
 export type FieldOutcome = FieldRef & { status: FillStatus };
 export type FillReport = { results: FieldOutcome[]; filled: number };
 
@@ -388,6 +405,11 @@ export type AutofillSettings = {
   answers: { language: "auto" | "en" | "de"; length: AnswerLength; tone: AnswerTone };
   /** The uploaded CV to suggest when GetCareer prepared none for the job ("resume:<id>"). */
   defaultCv: string | null;
+  /**
+   * "Fill application" also asks GetCareer for a resume tailored to the job and attaches it
+   * when it's ready (where GetCareer offers tailored resumes). Off: only on request.
+   */
+  tailoredResume: boolean;
 };
 
 // ---- Suggested answers, history (GetCareer API) --------------------------------------------

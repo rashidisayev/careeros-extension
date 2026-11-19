@@ -38,14 +38,15 @@ import type {
   ScanResult,
   UndoReport,
 } from "../autofill/types";
-import { appUrl, CAREEROS_ORIGIN } from "../shared/config";
+import { appUrl } from "../shared/config";
 import { ExtensionError, messageFor } from "../shared/errors";
 import { log } from "../shared/log";
-import { pageKind, restrictedPlatformFor } from "../shared/policy";
 import { loadSettings } from "../shared/settings";
 import type { TabState } from "../shared/types";
 import { api } from "./api";
 import { broadcastAutofill } from "./broadcast";
+import { allowedTab, base64, frameAllowed, hostOf, originOf } from "./pages";
+import { resumeFile } from "./resumes";
 import { sessionInfo } from "./session";
 import { readState } from "./tabs";
 
@@ -62,43 +63,6 @@ type PageApi = {
   attention: (fieldIds: string[]) => void;
   clearHighlights: () => void;
 };
-
-function originOf(url: string): string | null {
-  try {
-    return new URL(url).origin;
-  } catch {
-    return null;
-  }
-}
-
-function hostOf(url: string): string | null {
-  try {
-    return new URL(url).host.toLowerCase();
-  } catch {
-    return null;
-  }
-}
-
-/** The tab's address, after checking AutoFill may work there at all. */
-async function allowedTab(tabId: number): Promise<string> {
-  let tab: chrome.tabs.Tab;
-  try {
-    tab = await chrome.tabs.get(tabId);
-  } catch {
-    throw new ExtensionError("tab_closed", "This tab is no longer open.");
-  }
-  const url = tab.url ?? null;
-  if (!url) throw new ExtensionError("no_access", messageFor("no_access"));
-  if (pageKind(url, CAREEROS_ORIGIN) !== "web") throw new ExtensionError("autofill_unsupported", "AutoFill works on job application forms on other websites.");
-  const restricted = restrictedPlatformFor(url);
-  if (restricted) {
-    throw new ExtensionError(
-      "platform_restricted",
-      `${restricted.name} doesn't allow other services to read or fill its pages, so GetCareer AutoFill doesn't work there.`,
-    );
-  }
-  return url;
-}
 
 async function featureOn(feature: "autofill" | "autofill_documents" | "autofill_answers" | "autofill_history" | "autofill_saved_answers" = "autofill"): Promise<void> {
   const settings = await loadSettings();
@@ -118,11 +82,6 @@ async function featureOn(feature: "autofill" | "autofill_documents" | "autofill_
 async function hasFeature(feature: "autofill_documents" | "autofill_history"): Promise<boolean> {
   const s = await sessionInfo();
   return s.connected && s.bootstrap?.features[feature]?.enabled === true;
-}
-
-/** A frame may be read only if it is an ordinary site (not a restricted platform, not GetCareer). */
-function frameAllowed(frameUrl: string): boolean {
-  return pageKind(frameUrl, CAREEROS_ORIGIN) === "web" && !restrictedPlatformFor(frameUrl);
 }
 
 /** The job this tab shows, from what the side panel already read: the tracked application first. */
@@ -198,13 +157,6 @@ function byFrame<T extends FieldRef>(items: T[]): Map<number, T[]> {
   return m;
 }
 
-function base64(bytes: ArrayBuffer): string {
-  const view = new Uint8Array(bytes);
-  let out = "";
-  for (let i = 0; i < view.length; i += 0x8000) out += String.fromCharCode(...view.subarray(i, i + 0x8000));
-  return btoa(out);
-}
-
 /** Downloads the documents the user picked; one that can't be had is left out (the page reports it). */
 async function filesFor(items: FillItem[]): Promise<Record<string, PageFile>> {
   const out: Record<string, PageFile> = {};
@@ -212,6 +164,11 @@ async function filesFor(items: FillItem[]): Promise<Record<string, PageFile>> {
   for (const i of items) if (i.value.kind === "file") wanted.set(fileKey(i.value.ref, i.value.format), i.value);
   for (const [key, w] of wanted) {
     try {
+      // A resume tailored to this job: checked (type, size, header) and named by GetCareer.
+      if (w.ref.startsWith("job-resume:")) {
+        out[key] = await resumeFile(w.ref.slice("job-resume:".length), w.format);
+        continue;
+      }
       const got = await api.autofillFile(w.ref, w.format);
       if (got.bytes.byteLength === 0 || got.bytes.byteLength > MAX_FILE_BYTES) continue;
       out[key] = { name: w.name, mime: got.mime.split(";")[0]!.trim(), base64: base64(got.bytes) };
@@ -274,7 +231,8 @@ export async function fillTab(tabId: number, pageUrl: string, items: FillItem[],
   if (originOf(url) !== originOf(pageUrl)) {
     throw new ExtensionError("page_changed", "This tab shows a different site now. Check the form again before filling it.");
   }
-  if (items.some((i) => i.value.kind === "file")) await featureOn("autofill_documents");
+  // GetCareer's documents need that feature; a tailored resume checks its own (job_resumes).
+  if (items.some((i) => i.value.kind === "file" && !i.value.ref.startsWith("job-resume:"))) await featureOn("autofill_documents");
   const results: FieldOutcome[] = [];
   for (const [frameId, frameItems] of byFrame(items)) {
     const origin = frameItems[0]!.frameOrigin;

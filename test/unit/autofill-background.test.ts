@@ -232,7 +232,7 @@ describe("messages", () => {
 describe("settings", () => {
   it("adds AutoFill (on, every category but job preferences) when upgrading from version 1", () => {
     const { settings } = migrateSettings({ version: 1, theme: "light", defaultStatus: "applied", followTabs: false, diagnostics: false });
-    expect(settings).toMatchObject({ version: 3, theme: "light", autofill: DEFAULT_AUTOFILL });
+    expect(settings).toMatchObject({ version: 4, theme: "light", autofill: DEFAULT_AUTOFILL });
     expect(DEFAULT_SETTINGS.autofill.enabled).toBe(true);
   });
 
@@ -248,16 +248,17 @@ describe("settings", () => {
       history: true,
       answers: { language: "auto", length: "medium", tone: "professional" },
       defaultCv: null,
+      tailoredResume: true,
     });
   });
 
-  it("upgrades version 2 to 3 keeping the user's choices, with job preferences off", () => {
+  it("upgrades version 2 to the current one keeping the user's choices, with job preferences off", () => {
     const { settings } = migrateSettings({
       version: 2,
       theme: "light",
       autofill: { enabled: false, categories: { personal: true, professional: false, links: true }, excluded: ["phone"] },
     });
-    expect(settings.version).toBe(3);
+    expect(settings.version).toBe(4);
     expect(settings.autofill).toEqual({ ...DEFAULT_AUTOFILL, enabled: false, categories: { ...DEFAULT_AUTOFILL.categories, professional: false }, excluded: ["phone"] });
     expect(settings.autofill.categories.preferences).toBe(false);
   });
@@ -268,6 +269,14 @@ describe("settings", () => {
     expect(ok).toMatchObject({ answers: { language: "de", length: "short", tone: "warm" }, defaultCv: cv, history: false });
     const bad = migrateSettings({ version: 3, autofill: { answers: { language: "fr", length: 9, tone: "rude" }, defaultCv: "generated:x/../../y", history: "yes" } }).settings.autofill;
     expect(bad).toMatchObject({ answers: DEFAULT_AUTOFILL.answers, defaultCv: null, history: true });
+  });
+
+  it("upgrades version 3 to 4 with tailored resumes on, keeping everything else, and respects 'off'", () => {
+    const up = migrateSettings({ version: 3, theme: "light", autofill: { ...DEFAULT_AUTOFILL, history: false, tailoredResume: undefined } });
+    expect(up.settings.version).toBe(4);
+    expect(up.settings.autofill).toMatchObject({ history: false, tailoredResume: true });
+    expect(migrateSettings({ version: 4, autofill: { tailoredResume: false } }).settings.autofill.tailoredResume).toBe(false);
+    expect(migrateSettings({ version: 4, autofill: { tailoredResume: "yes" } }).settings.autofill.tailoredResume).toBe(true);
   });
 });
 

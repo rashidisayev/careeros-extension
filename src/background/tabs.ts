@@ -109,6 +109,12 @@ async function withLookup(state: TabState): Promise<TabState> {
   }
 }
 
+/** Looks the tab's posting up again: GetCareer may have just created its application. */
+export async function refreshLookup(tabId: number): Promise<void> {
+  const state = await readState(tabId);
+  if (state) await writeState({ ...(await withLookup(state)), checkedAt: Date.now() });
+}
+
 /**
  * The state of a tab, from cache when the page hasn't changed. `refresh` reads the page and
  * looks it up again (after the user asked, or after saving).

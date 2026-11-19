@@ -120,6 +120,10 @@ In the review (Phases 2 and 3):
   this job, else the default CV from Options, else the newest), with a picker and a format
   choice that respects the field's `accept`. The file is downloaded only when the user fills,
   and a file already on the form is replaced only if the user ticks it.
+- **Tailored resume**: with *Create a tailored resume when I fill an application* on,
+  GetCareer writes a resume for this job while the user reviews; it takes the CV row when
+  ready and is attached after *Fill*, and reported as attached only when the form shows it.
+  Otherwise it is offered as a download. See [RESUMES.md](RESUMES.md).
 - **Questions left to the user** can be answered right in the panel (*Answer here*), with
   *Remember for other applications*. Open questions get *Suggest an answer*, or *Suggest
   answers (n)* for all of them.
@@ -243,6 +247,10 @@ Screenshots: `test-results/screens/popup-autofill-dark.png`, `panel-autofill-*.p
 - **Location search boxes are not filled.** Greenhouse's "Location (City)" and similar
   fields search a remote place list. They are listed for the user, because several places
   often share a name.
+- **Attached files are confirmed by watching the page** for 3 seconds (the name shown, or
+  the browser's own file control holding it; an upload error means refused). A file the page
+  neither shows nor refuses is reported as *not confirmed* with a dashed outline, never as
+  attached.
 - **List choices and attached files can't be undone by AutoFill.** Undo reports them as
   "change it on the page". Text, selects, radios, checkboxes and multi-selects are restored.
 - **One role per entry the form shows.** AutoFill never clicks "Add another". When the

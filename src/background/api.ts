@@ -1,14 +1,18 @@
 /**
  * Authenticated calls to GetCareer. Every endpoint the extension uses is listed here; they are
- * the same endpoints the web app uses (job imports, applications) plus the two extension
- * endpoints (bootstrap, lookup). See docs/API_INTEGRATION.md.
+ * the same endpoints the web app uses (job imports, applications, job-specific resumes) plus
+ * the extension endpoints (bootstrap, lookup, AutoFill). See docs/API_INTEGRATION.md.
  */
 import type {
   ApplicationDetail,
   Bootstrap,
   ImportOut,
   ImportSave,
+  JobResumeCreate,
+  JobResumeOut,
+  JobResumeStatusOut,
   LookupOut,
+  ResumeFormat,
 } from "../shared/api-types";
 import type { AnswersOut, AutofillProfile, DocumentsOut, HistoryEntry, SavedAnswer } from "../autofill/types";
 import type { ExtensionError } from "../shared/errors";
@@ -77,4 +81,15 @@ export const api = {
   updateHistory: (id: string, body: Record<string, unknown>) => call<HistoryEntry>(`/extension/autofill/history/${id}`, { method: "PUT", body }),
   deleteHistory: (id?: string) => call<null>(id ? `/extension/autofill/history/${id}` : "/extension/autofill/history", { method: "DELETE" }),
   autofillEvent: (body: Record<string, unknown>) => call<null>("/extension/autofill/events", { method: "POST", body }),
+  // Job-specific resumes (docs/RESUMES.md, the API's docs/api/job-resumes.md). `key`: one
+  // Idempotency-Key per user action, so a resent request never starts a second generation.
+  jobResumeCreate: (body: JobResumeCreate, key: string) =>
+    call<JobResumeOut>("/job-resumes", { method: "POST", body, headers: { "Idempotency-Key": key }, idempotent: true, timeoutMs: 30_000 }),
+  jobResumeStatus: (id: string) => call<JobResumeStatusOut>(`/job-resumes/${id}/status`),
+  jobResume: (id: string) => call<JobResumeOut>(`/job-resumes/${id}`),
+  jobResumesFor: (applicationId: string) => call<JobResumeOut[]>(`/job-resumes?application_id=${applicationId}&include_deleted=false`),
+  jobResumeRegenerate: (id: string, body: { language?: "en" | "de" }, key: string) =>
+    call<JobResumeOut>(`/job-resumes/${id}/regenerate`, { method: "POST", body, headers: { "Idempotency-Key": key }, idempotent: true, timeoutMs: 30_000 }),
+  /** The file itself, streamed to the signed-in owner: no download link to keep secret. */
+  jobResumeFile: (id: string, format: ResumeFormat) => call<{ bytes: ArrayBuffer; mime: string }>(`/job-resumes/${id}/files/${format}`, { as: "bytes", timeoutMs: 60_000 }),
 };

@@ -212,6 +212,17 @@ extension offers the paste form.
 `POST /job-imports/{id}/apply-to/{application_id}` (update an existing application) is
 deliberately not used. The extension never changes an existing application.
 
+### Job-specific resumes (`/job-resumes`)
+
+Used by AutoFill's tailored resume, against GetCareer's published contract
+(`docs/api/job-resumes.md` and `job-resumes.openapi.json` in the GetCareer repo):
+`POST /job-resumes` (with `Idempotency-Key`), `GET /job-resumes?application_id=`,
+`GET /job-resumes/{id}`, `GET /job-resumes/{id}/status`, `POST /job-resumes/{id}/regenerate`
+and `GET /job-resumes/{id}/files/{pdf|docx}`. The feature switch is
+`bootstrap.features.job_resumes`. Download links (`/download`, `/job-resume-files/{token}`)
+and `DELETE` are not used. Request bodies, retries, duplicate prevention and error handling
+are in [RESUMES.md](RESUMES.md).
+
 ## Error codes the extension handles specially
 
 | Code or status | Behaviour |
@@ -223,6 +234,7 @@ deliberately not used. The extension never changes an existing application.
 | `invalid_session` (401 after one refresh) | Connect screen |
 | `update_required` (from `min_extension_version`) | Update notice instead of the UI |
 | `ai_consent_required` (suggested answers) | "Allow AI processing in your GetCareer settings to get suggested answers." with a link to the settings |
+| Job resumes: `ai_consent_required`, `application_closed`, `job_details_required`, `job_description_required`, `profile_incomplete`, `rate_limited`, `generation_unavailable`, `resume_deleted`, `resume_expired`, `format_not_available`, 409 `generation_in_progress` | A message per code (`RESUME_ERRORS` in `src/shared/resumes.ts`), with a link where the user can fix it; 409 on regenerate follows the running version. AutoFill itself goes on |
 | 404 on `PUT /extension/autofill/history/{id}` | The entry was deleted meanwhile: a new one is started |
 | Anything else | The API's message as is, or the extension's message for network errors |
 
@@ -235,5 +247,6 @@ version in `X-CareerOS-Client` and in the capture. The `X-Request-ID` of failed 
 kept in the diagnostics log (Options → Copy diagnostics) for support.
 
 Type definitions: `src/shared/api-types.ts`, hand-written from the API
-schemas (`app/extension/schemas.py`, `app/auth/schemas.py`, `app/job_imports/schemas.py`).
+schemas (`app/extension/schemas.py`, `app/auth/schemas.py`, `app/job_imports/schemas.py`,
+and the job-resume OpenAPI file).
 The live tests (`pnpm test:live`) check them against the running API.

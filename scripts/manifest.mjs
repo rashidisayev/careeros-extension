@@ -30,6 +30,9 @@ export function manifest({ version, careerosUrl, mode, target, e2e = false, side
     permissions: ["activeTab", "scripting", "storage", "sidePanel", "identity", "contextMenus"],
     host_permissions: [`${origin}/*`],
     optional_host_permissions: ["https://*/*"],
+    // Asked for the first time the user saves a tailored resume, so the panel can say when the
+    // download finished (without it, the file is saved as an ordinary download).
+    optional_permissions: ["downloads"],
     commands: {
       _execute_action: {
         suggested_key: { default: "Alt+Shift+J" },

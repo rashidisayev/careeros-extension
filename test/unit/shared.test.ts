@@ -133,7 +133,7 @@ describe("settings", () => {
       set: async (v: { settings: unknown }) => void (stored = v.settings),
     } as unknown as chrome.storage.StorageArea;
     expect((await loadSettings(area)).theme).toBe("dark");
-    expect(stored).toMatchObject({ theme: "dark", version: 3 });
+    expect(stored).toMatchObject({ theme: "dark", version: 4 });
   });
   it("doesn't rewrite current settings stored with their keys in another order", async () => {
     const reordered = Object.fromEntries(Object.entries(DEFAULT_SETTINGS).reverse());
@@ -147,7 +147,7 @@ describe("settings", () => {
   it("upgrades an old copy in storage", async () => {
     await chrome.storage.local.set({ settings: { version: 1, theme: "light" } });
     expect((await loadSettings()).autofill).toEqual(DEFAULT_SETTINGS.autofill);
-    expect((await chrome.storage.local.get("settings")).settings).toMatchObject({ version: 3, theme: "light", autofill: { enabled: true } });
+    expect((await chrome.storage.local.get("settings")).settings).toMatchObject({ version: 4, theme: "light", autofill: { enabled: true, tailoredResume: true } });
   });
   it("saves a patch", async () => {
     expect((await saveSettings({ theme: "system" })).theme).toBe("system");

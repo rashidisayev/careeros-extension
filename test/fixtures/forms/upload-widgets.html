@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head><title>Apply · Contoso</title></head>
+<body>
+  <!-- Upload widgets as job boards build them: the real file input is hidden and a script shows
+       what was chosen (or complains). AutoFill must count a file as attached only when the
+       page shows it. -->
+  <form id="apply">
+    <label for="first">First name</label><input id="first" name="first_name">
+    <label for="last">Last name</label><input id="last" name="last_name">
+    <label for="email">Email</label><input id="email" name="email" type="email">
+
+    <div class="upload" id="drop-zone">
+      <label for="drop">Resume/CV</label>
+      <input id="drop" name="resume" type="file" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">
+      <button type="button">Attach</button>
+      <span class="chosen"></span>
+    </div>
+
+    <div class="upload" id="silent-zone">
+      <label for="silent">Cover letter</label>
+      <input id="silent" name="cover_letter" type="file" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">
+      <button type="button">Attach</button>
+    </div>
+
+    <div class="upload" id="strict-zone">
+      <label for="strict">Portfolio</label>
+      <input id="strict" name="portfolio" type="file" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">
+      <button type="button">Attach</button>
+      <p class="hint">Max. 5 MB.</p>
+      <p class="error"></p>
+    </div>
+    <div class="upload" id="clearing-zone">
+      <label for="clearing">Writing sample</label>
+      <input id="clearing" name="sample" type="file" class="visually-hidden" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">
+      <button type="button">Attach</button>
+      <ul class="chips"></ul>
+    </div>
+  </form>
+  <script>
+    {
+      const shows = (id, fn) => document.getElementById(id).addEventListener("change", (e) => fn(e.target));
+      // A widget that lists the chosen file after a short "upload".
+      shows("drop", (input) => {
+        const name = input.files && input.files[0] ? input.files[0].name : "";
+        setTimeout(() => (document.querySelector("#drop-zone .chosen").textContent = name), 300);
+      });
+      // A widget that keeps the file itself and empties the input (to allow choosing it again).
+      shows("clearing", (input) => {
+        const name = input.files && input.files[0] ? input.files[0].name : "";
+        const li = document.createElement("li");
+        li.textContent = name;
+        document.querySelector("#clearing-zone .chips").appendChild(li);
+        try { input.value = ""; } catch (e) {}
+      });
+      // A widget that only accepts images and says so.
+      shows("strict", () => {
+        setTimeout(() => (document.querySelector("#strict-zone .error").textContent = "This file type is not supported."), 200);
+      });
+    }
+  </script>
+</body>
+</html>

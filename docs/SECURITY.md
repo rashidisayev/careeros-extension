@@ -15,10 +15,11 @@ authoritative. Authentication details are in [AUTHENTICATION.md](AUTHENTICATION.
 | `identity` | `launchWebAuthFlow` for connecting to GetCareer | Reading your Google or browser account; the extension doesn't use `getAuthToken` |
 | `contextMenus` | "Save this job to GetCareer" and "Save selected text as a job description" | — |
 | Host: the GetCareer origin only (`https://getcareer.io/*`) | Call the GetCareer API from the service worker | Any other site |
+| Optional: `downloads` | Requested on the first click on *Download PDF/Word* of a tailored resume, so the extension can save the file under its name and report when the download finished or failed. Declining it still works: the file is saved through a plain browser download | Reading, opening or deleting other downloads; the extension only starts its own |
 | Optional host: `https://*/*` | Requested **per site** when you choose *Read this site automatically* in the side panel, so the panel can read postings there without a click per page. Revocable in the panel, in Options or in the browser | All sites at once: only the one origin you approved is granted |
 
 Not requested: `tabs` (URLs come from `activeTab` and granted sites), `history`, `cookies`,
-`webRequest`, `<all_urls>`, `downloads`, `notifications`, `clipboardRead`. There are no
+`webRequest`, `<all_urls>`, `notifications`, `clipboardRead` (and `downloads` only as an optional permission). There are no
 `content_scripts`, no `web_accessible_resources` (pages can't detect or load the extension)
 and no `externally_connectable` (web pages can't message it).
 
@@ -90,6 +91,13 @@ The extension is a client; the API doesn't trust it.
 - **AutoFill documents:** a CV or cover letter is downloaded from GetCareer only when you fill
   a file field you ticked, handed to that page once and not stored. The page script accepts
   only a file the field's `accept` list allows.
+- **Tailored resumes:** written, stored and deleted by GetCareer, with the user's AI
+  consent. The extension sends the posting (title, company, description, location,
+  requirements, link) only when the user runs AutoFill with the setting on, and asks first
+  when the details are incomplete. The file is fetched with the bearer token right before it
+  is attached or saved, checked (type, size, header) and not kept; the extension never holds
+  a download link. Only resume ids are stored, in session storage, under hashed keys. Logs
+  hold codes and counts only. Details in [RESUMES.md](RESUMES.md).
 - **AutoFill answers and history:** GetCareer receives the question texts you ask it to draft
   (with the job) and the answers you tick *Remember* for. Drafts are made on the server,
   only with your AI consent, never for salary, legal or personal questions, and are never

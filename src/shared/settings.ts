@@ -12,7 +12,7 @@ import { FILLABLE_CATEGORIES, type AnswerLength, type AnswerTone, type AutofillS
 import { APPLICATION_STATUSES, type ApplicationStatus } from "./api-types";
 
 export const SETTINGS_KEY = "settings";
-export const SETTINGS_VERSION = 3;
+export const SETTINGS_VERSION = 4;
 
 export type Theme = "dark" | "light" | "system";
 
@@ -38,6 +38,7 @@ export const DEFAULT_AUTOFILL: AutofillSettings = {
   history: true,
   answers: { language: "auto", length: "medium", tone: "professional" },
   defaultCv: null,
+  tailoredResume: true,
 };
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -71,6 +72,11 @@ export const MIGRATIONS: Record<number, Migration> = {
       },
     };
   },
+  // 4: a tailored resume for each application filled, on by default (GetCareer offers it per account).
+  3: (raw) => {
+    const a = raw.autofill && typeof raw.autofill === "object" ? (raw.autofill as Record<string, unknown>) : {};
+    return { ...raw, autofill: { ...a, tailoredResume: true } };
+  },
 };
 
 const THEMES: Theme[] = ["dark", "light", "system"];
@@ -98,7 +104,15 @@ export function cleanAutofill(value: unknown): AutofillSettings {
     tone: pick<AnswerTone>(ans.tone, ["professional", "concise", "warm", "executive"], d.tone),
   };
   const defaultCv = typeof v.defaultCv === "string" && /^resume:[0-9a-f-]{36}$/i.test(v.defaultCv) ? v.defaultCv : null;
-  return { enabled: bool(v.enabled, DEFAULT_AUTOFILL.enabled), categories, excluded, history: bool(v.history, DEFAULT_AUTOFILL.history), answers, defaultCv };
+  return {
+    enabled: bool(v.enabled, DEFAULT_AUTOFILL.enabled),
+    categories,
+    excluded,
+    history: bool(v.history, DEFAULT_AUTOFILL.history),
+    answers,
+    defaultCv,
+    tailoredResume: bool(v.tailoredResume, DEFAULT_AUTOFILL.tailoredResume),
+  };
 }
 
 /** JSON with sorted keys: storage may return keys in another order than they were written. */
