@@ -5,3 +5,4 @@ test-results/
 playwright-report/
 *.pem
 .vitest/
+.DS_Store

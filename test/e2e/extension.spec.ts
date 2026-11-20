@@ -18,7 +18,10 @@ const API = "http://localhost:3000/api/v1";
 const run = Date.now().toString(36);
 const EMAIL = `ext-e2e-${run}@example.com`;
 const PASSWORD = `E2e-test-${run}-pw!`;
-const COMPANY = `Northwind E2E ${run}`;
+// STORE_SHOTS=1: plain names for Chrome Web Store screenshots (each run has a fresh account).
+const STORE_SHOTS = !!process.env.STORE_SHOTS;
+const COMPANY = STORE_SHOTS ? "Northwind Logistics" : `Northwind E2E ${run}`;
+const HANDLE = STORE_SHOTS ? "erika-schmidt" : "erika-e2e";
 const SHOTS = resolve(ROOT, "test-results/screens");
 const SNAPS = resolve(ROOT, "test-results/snapshots");
 
@@ -108,7 +111,7 @@ test.beforeAll(async () => {
   const reg = await fetch(`${API}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email: EMAIL, password: PASSWORD, full_name: "Extension E2E", accept_terms: true, accept_privacy: true }),
+    body: JSON.stringify({ email: EMAIL, password: PASSWORD, full_name: "Erika Schmidt", accept_terms: true, accept_privacy: true }),
   });
   expect(reg.status).toBe(201);
   remember(reg);
@@ -290,8 +293,8 @@ test("AutoFill: fills an application form from the Career Profile, after review,
     current_title: "Head of Platform",
     years_of_experience: 12,
     has_management_experience: true,
-    linkedin_url: "https://www.linkedin.com/in/erika-e2e",
-    github_url: "https://github.com/erika-e2e",
+    linkedin_url: `https://www.linkedin.com/in/${HANDLE}`,
+    github_url: `https://github.com/${HANDLE}`,
   });
   expect(prof.status).toBe(200);
   expect((await web("/career-profile/experience", "POST", { company: "Nordlicht Payments", job_title: "Head of Platform", is_current: true })).status).toBe(201);

@@ -1,5 +1,5 @@
 /**
- * Builds the extension into dist/:
+ * Builds the extension into dist/ (dist-store/ for Chrome store builds, dist-edge/, dist-e2e/):
  *   popup.html, sidepanel.html, options.html  (React pages)
  *   background.js                             (service worker, ES module)
  *   extractor.js                              (page reader, one self-contained IIFE)
@@ -37,7 +37,10 @@ const careerosUrl = process.env.GETCAREER_URL || process.env.CAREEROS_URL || (mo
 const e2e = values.e2e;
 const sideload = values.sideload;
 if (e2e && mode === "production") throw new Error("--e2e is for development builds only");
-const outDir = `${root}/dist${e2e ? "-e2e" : target === "edge" ? "-edge" : ""}`;
+// Chrome store builds get their own folder: dist/ is the sideload copy loaded unpacked, and a
+// keyless build there would change the installed extension's id.
+const store = mode === "production" && target === "chrome" && !sideload;
+const outDir = `${root}/dist${e2e ? "-e2e" : target === "edge" ? "-edge" : store ? "-store" : ""}`;
 
 if (mode === "production" && !careerosUrl.startsWith("https://")) {
   throw new Error("Production builds must talk to GetCareer over https");

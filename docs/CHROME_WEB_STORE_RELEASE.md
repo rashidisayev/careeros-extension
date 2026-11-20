@@ -1,6 +1,6 @@
 # GetCareer Companion — Chrome Web Store and Edge Add-ons release
 
-Not published yet. This is the checklist for the first release and every update after it.
+Not published yet. Chrome Web Store item id: `flckbclfgaidajgegjablmeppipgppna`. This is the checklist for the first release and every update after it.
 
 ## 1. Before the first release (one-time)
 
@@ -16,7 +16,7 @@ Not published yet. This is the checklist for the first release and every update 
       `docker compose up -d api`. With the list empty, production refuses every extension.
 - [ ] **Deploy the backend:** migration `7c2e5a91b4d0` and the API, worker and web changes.
       Check that `/connect/extension` loads on `https://getcareer.io`.
-- [ ] **Smoke test with the store build:** load `dist` unpacked, then connect, save a job,
+- [ ] **Smoke test with the store build:** load `dist-store` unpacked, then connect, save a job,
       check its status, and disconnect, against production with a test account. Note that an
       unpacked production build has a different id from the store's; allow that id
       temporarily, or test with a draft published to trusted testers.
@@ -54,21 +54,8 @@ unzip -l release/getcareer-companion-<version>-chrome.zip                 # no .
 | Support | The support address from the Impressum |
 | Privacy policy URL | The Datenschutz page anchor for the extension |
 
-Description (draft):
-
-> GetCareer Companion connects your browser to your GetCareer account.
->
-> - **Save a job in one click:** GetCareer reads the posting you're on and fills in the
->   details. You check every field, see where each value came from, and save.
-> - **Know what you already track:** open a posting you saved before and see its stage and
->   match right away.
-> - **No accidental duplicates:** if you already track the job, GetCareer tells you, and
->   it never changes your existing application.
-> - **Private by design:** the extension reads a page only when you ask, sends only the job
->   posting, and never reads LinkedIn, Indeed and similar sites automatically (their terms
->   don't allow it). Select the description there and save the selection instead.
->
-> Requires a GetCareer account.
+Description, privacy form answers, test instructions and image files: [STORE_LISTING.md](STORE_LISTING.md)
+(the current text; the drafts below in section 4 predate AutoFill).
 
 ## 4. Privacy practices form (Chrome) and the Edge equivalent
 

@@ -205,8 +205,8 @@ warning is unchanged.
 ## Settings
 
 `autofill.tailoredResume` (settings version 4; the migration from 3 sets it to `true`).
-Options → AutoFill → *Tailored resumes*. When it is off, the card isn't shown and AutoFill
-offers the CVs uploaded to GetCareer as before.
+Options → AutoFill → *Tailored resumes*. When it is off, nothing starts by itself: the card
+offers *Create tailored resume* and the CV row offers the CVs uploaded to GetCareer as before.
 
 ## Code map
 

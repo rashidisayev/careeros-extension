@@ -14,7 +14,7 @@ import { parseArgs } from "node:util";
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const { values } = parseArgs({ options: { target: { type: "string", default: "chrome" } } });
 const target = values.target === "edge" ? "edge" : "chrome";
-const dist = `${root}/dist${target === "edge" ? "-edge" : ""}`;
+const dist = `${root}/dist${target === "edge" ? "-edge" : "-store"}`;
 const manifest = JSON.parse(readFileSync(`${dist}/manifest.json`, "utf8"));
 
 const problems = [];
