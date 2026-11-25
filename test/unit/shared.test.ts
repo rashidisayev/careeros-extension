@@ -92,6 +92,10 @@ describe("policy", () => {
 describe("config", () => {
   it("builds GetCareer links only for app paths", () => {
     expect(appUrl("/applications/1")).toBe("http://localhost:3000/applications/1");
+    expect(appUrl("/mcp-server#claude")).toBe("http://localhost:3000/mcp-server#claude");
+    // The background checks the path again; a page anchor must pass both checks.
+    expect(parseRequest({ type: "app.open", path: "/mcp-server#claude" })).toEqual({ type: "app.open", path: "/mcp-server#claude" });
+    expect(parseRequest({ type: "app.open", path: "//evil.example#x" })).toBeNull();
     expect(() => appUrl("//evil.example")).toThrow();
     expect(() => appUrl("https://evil.example")).toThrow();
   });

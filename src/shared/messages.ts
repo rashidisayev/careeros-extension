@@ -324,7 +324,7 @@ export function parseRequest(raw: unknown): Request | null {
     case "application.get":
       return isUuid(r.applicationId) ? { type: r.type, applicationId: r.applicationId } : null;
     case "app.open":
-      return typeof r.path === "string" && /^\/[A-Za-z0-9/_\-?=&.%]{0,300}$/.test(r.path) && !r.path.startsWith("//")
+      return typeof r.path === "string" && /^\/[A-Za-z0-9/_\-?=&.%#]{0,300}$/.test(r.path) && !r.path.startsWith("//")
         ? { type: r.type, path: r.path }
         : null;
     case "settings.set":

@@ -245,6 +245,8 @@ test("reads a job page, reviews and saves it in the side panel, then shows its s
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/popup.html?tab=${tabId}`);
   await expect(popup.getByText("Already in your applications")).toBeVisible();
+  await expect(popup.getByRole("heading", { name: "Connect with Claude" })).toBeVisible();
+  await expect(popup.getByRole("button", { name: /Connect to Claude/ })).toBeEnabled();
   await popup.screenshot({ path: `${SHOTS}/popup-tracked-dark.png` });
 
   await setTheme("light");
@@ -252,6 +254,12 @@ test("reads a job page, reviews and saves it in the side panel, then shows its s
   await expect(popup.getByText("Already in your applications")).toBeVisible();
   await popup.screenshot({ path: `${SHOTS}/popup-tracked-light.png` });
   await snapshot(popup, "popup-tracked-light");
+  // "Connect to Claude" opens the connector's setup steps on GetCareer.
+  await popup.getByRole("button", { name: /Connect to Claude/ }).click();
+  await expect
+    .poll(() => context.pages().map((p) => new URL(p.url())).find((u) => u.pathname === "/mcp-server")?.hash)
+    .toBe("#claude");
+  await context.pages().find((p) => p.url().includes("/mcp-server"))?.close();
   await panel.reload();
   await expect(panel.getByRole("heading", { name: "Already in your applications" })).toBeVisible();
   await panel.screenshot({ path: `${SHOTS}/panel-tracked-light.png`, fullPage: true });

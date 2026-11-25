@@ -5,6 +5,7 @@ import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Alert, Button } from "../ui/components";
 import { send } from "../ui/client";
+import { ClaudeCard } from "../ui/claude-card";
 import { AutofillSummary, autofillAvailable, useAutofill } from "../ui/autofill-view";
 import { useSession, useSettings, useTabState, useTheme } from "../ui/hooks";
 import { Header, INTENT_KEY, openPanelFor, SessionGate, type Intent } from "../ui/shell";
@@ -93,6 +94,7 @@ function Popup() {
                     saving: busy,
                   }}
                 />
+                <ClaudeCard onOpen={open} />
                 </>
               )}
             </>

@@ -13,7 +13,7 @@ export const IS_PRODUCTION = BUILD_MODE === "production";
 
 /** Path inside the GetCareer web app; anything else is refused (no open redirects). */
 export function appUrl(path: string): string {
-  if (!/^\/[A-Za-z0-9/_\-?=&.%]*$/.test(path) || path.startsWith("//")) {
+  if (!/^\/[A-Za-z0-9/_\-?=&.%#]*$/.test(path) || path.startsWith("//")) {
     throw new Error("Not a GetCareer path");
   }
   return `${CAREEROS_URL}${path}`;
